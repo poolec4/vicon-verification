@@ -159,7 +159,7 @@ void *vicon_thread(void *thread_id)
 	while(SYSTEM_ON==true)
 	{
 		VICON.loop();
-		printf("Vicon tx: %.3f",UAV.x_v);
+		printf("Vicon tx: %.3f",UAV.x_v(0));
 	}
 
 	VICON.close();
