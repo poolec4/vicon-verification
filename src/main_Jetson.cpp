@@ -24,7 +24,6 @@
 #include "fdcl_EKF.h"
 #include "fdcl_vn100.h"
 #include "fdcl_vicon.h"
-#include "TrackingViewer.hpp"
 
 using Eigen::MatrixXd;
 
