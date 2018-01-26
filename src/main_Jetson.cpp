@@ -119,10 +119,24 @@ void *zed_thread(void *thread_id)
 
 	printf("ZED: thread initialized..\n");
 
-
+	while(SYSTEM_ON == true)
+	{
+		sl::Pose zed_pose;
+		if (zed.grab() == SUCCESS) 
+		{
+	        // Get the pose of the camera relative to the world frame
+	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
+	        // Display translation and timestamp
+	        printf("Translation: tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\r",
+	        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
+	        // Display orientation quaternion
+	        printf("Orientation: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\r",
+	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
+		}
+	}
+	
 	printf("ZED: thread closing\n");
 	pthread_exit(NULL);
-
 }
 
 void *data_thread(void *thread_id)
