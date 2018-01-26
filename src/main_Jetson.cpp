@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <iostream>
+#include <fstream>
 
 #include "Eigen/Dense"
 
@@ -25,12 +26,20 @@
 
 using Eigen::MatrixXd;
 using namespace std;
+using namespace sl;
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
 bool CALIBRATE_ON=false;
 bool CALIBRATE_DONE=false;
 int  COMMAND_MODE=0;
+
+// ZED includes and definitions
+#include <sl/Camera.hpp>
+sl::Camera zed;
+sl::Pose camera_pose;
+std::thread zed_callback;
+bool quit = false;
 
 #define NUM_THREADS 5
 
@@ -49,6 +58,12 @@ fdcl_control CTRL;
 void *data_thread(void *thread_id);
 void *vicon_thread(void *thread_id);
 void *zed_thread(void *thread_id);
+
+// ZED functions
+void startZED();
+void run();
+void close();
+void transformPose(sl::Transform &pose, float tx);
 
 int main()
 {
@@ -104,10 +119,93 @@ void *zed_thread(void *thread_id)
 
 	printf("ZED: thread initialized..\n");
 
+	// Set configuration parameters for the ZED
+    InitParameters initParameters;
+    initParameters.camera_resolution = RESOLUTION_HD720;
+    initParameters.depth_mode = DEPTH_MODE_PERFORMANCE;
+    initParameters.coordinate_units = UNIT_METER;
+    initParameters.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
+
+    if (argc > 1 && std::string(argv[1]).find(".svo"))
+        initParameters.svo_input_filename.set(argv[1]);
+
+    // Open the camera
+    ERROR_CODE err = zed.open(initParameters);
+    if (err != sl::SUCCESS) {
+        std::cout << sl::toString(err) << std::endl;
+        zed.close();
+        return 1; // Quit if an error occurred
+    }
+
+    // Set positional tracking parameters
+    TrackingParameters trackingParameters;
+    trackingParameters.initial_world_transform = sl::Transform::identity();
+    trackingParameters.enable_spatial_memory = true;
+
+    // Start motion tracking
+    zed.enableTracking(trackingParameters);
+
+    // Start ZED callback
+    startZED();
+
+    return 0;
 
 	printf("ZED: thread closing\n");
 	pthread_exit(NULL);
 
+}
+
+void startZED() {
+    quit = false;
+    zed_callback = std::thread(run);
+}
+
+void run() {
+
+    float tx = 0, ty = 0, tz = 0;
+    float rx = 0, ry = 0, rz = 0;
+
+    float translation_left_to_center = zed.getCameraInformation().calibration_parameters.T.x * 0.5f;
+
+    while (!quit && zed.getSVOPosition() != zed.getSVONumberOfFrames() - 1) {
+        if (zed.grab() == SUCCESS) {
+            TRACKING_STATE tracking_state = zed.getPosition(camera_pose, sl::REFERENCE_FRAME_WORLD);
+
+            if (tracking_state == TRACKING_STATE_OK) {
+                transformPose(camera_pose.pose_data, translation_left_to_center); // Get the pose at the center of the camera (baseline/2 on X axis)
+
+                // Update camera position in the viewing window
+                viewer.updateZEDPosition(camera_pose.pose_data);
+
+                // Get quaternion, rotation and translation
+                sl::float4 quaternion = camera_pose.getOrientation();
+                sl::float3 rotation = camera_pose.getEulerAngles(); // Only use Euler angles to display absolute angle values. Use quaternions for transforms.
+                sl::float3 translation = camera_pose.getTranslation();
+
+                // Display translation and rotation (pitch, yaw, roll in OpenGL coordinate system)
+                snprintf(text_rotation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", rotation.x, rotation.y, rotation.z);
+                snprintf(text_translation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", translation.x, translation.y, translation.z);
+            }
+        } else sl::sleep_ms(1);
+    }
+}
+
+void transformPose(sl::Transform &pose, float tx) {
+    sl::Transform transform_;
+    transform_.setIdentity();
+    // Move the tracking frame by tx along the X axis
+    transform_.tx = tx;
+    // Apply the transformation
+    pose = Transform::inverse(transform_) * pose * transform_;
+}
+
+void close() {
+    quit = true;
+    zed_callback.join();
+    zed.disableTracking("./ZED_spatial_memory"); // Record an area file
+
+    zed.close();
+    viewer.exit();
 }
 
 void *data_thread(void *thread_id)
@@ -125,13 +223,13 @@ void *data_thread(void *thread_id)
 void *vicon_thread(void *thread_id)
 {
 	VICON.open();
-	cout << "fdcl_vicon: opened" << endl;
+	printf("VICON: thread initialized..\n");
 
 	while(SYSTEM_ON==true)
 		VICON.loop();
 
 	VICON.close();
-	cout << "fdcl_vicon: closed" << endl;
+	printf("VICON: thread closing\n");
 	pthread_exit(NULL);
 
 }
