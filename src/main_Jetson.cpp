@@ -43,7 +43,7 @@ sl::Pose camera_pose;
 std::thread zed_callback;
 bool quit = false;
 // OpenGL window to display camera motion
-GLViewer viewer;
+//GLViewer viewer;
 
 const int MAX_CHAR = 128;
 
@@ -117,14 +117,14 @@ int main()
     zed.enableTracking(trackingParameters);
 
     // Initialize OpenGL viewer
-    viewer.init(zed.getCameraInformation().camera_model);
+    //viewer.init(zed.getCameraInformation().camera_model);
 
     // Start ZED callback
     //startZED();
 
     // Set the display callback
-    glutCloseFunc(close);
-    glutMainLoop();
+    //glutCloseFunc(close);
+    //glutMainLoop();
 
 	param.sched_priority = fifo_max_prio;
 	pthread_attr_setschedparam(&attr, &param);
@@ -183,7 +183,7 @@ void *zed_thread(void *thread_id)
                 transformPose(camera_pose.pose_data, translation_left_to_center); // Get the pose at the center of the camera (baseline/2 on X axis)
 
                 // Update camera position in the viewing window
-                viewer.updateZEDPosition(camera_pose.pose_data);
+                //viewer.updateZEDPosition(camera_pose.pose_data);
 
                 // Get quaternion, rotation and translation
                 sl::float4 quaternion = camera_pose.getOrientation();
@@ -203,7 +203,7 @@ void *zed_thread(void *thread_id)
             }
 
             // Update rotation, translation and tracking state values in the OpenGL window
-            viewer.updateText(string(text_translation), string(text_rotation), tracking_state);
+            //viewer.updateText(string(text_translation), string(text_rotation), tracking_state);
         } else sl::sleep_ms(1);
     }
 
@@ -228,7 +228,7 @@ void close() {
     zed.disableTracking("./ZED_spatial_memory"); // Record an area file
 
     zed.close();
-    viewer.exit();
+    //viewer.exit();
 }
 
 void *data_thread(void *thread_id)
