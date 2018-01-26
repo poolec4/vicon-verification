@@ -26,6 +26,7 @@
 
 using Eigen::MatrixXd;
 using namespace std;
+using namespace sl;
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
