@@ -29,6 +29,29 @@ include_directories(${PROJECT_SOURCE_DIR}/libraries/vectornav/include)
 include_directories(${PROJECT_SOURCE_DIR}/libraries/eigen)
 include_directories(${GTK3_INCLUDE_DIRS})
 
+find_package(ZED 2 REQUIRED)
+find_package(GLUT REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(CUDA ${ZED_CUDA_VERSION} EXACT REQUIRED)
+
+IF(NOT WIN32)
+     SET(SPECIAL_OS_LIBS "pthread" "X11")
+    add_definitions(-Wno-write-strings)
+ENDIF()
+ 
+include_directories(${ZED_INCLUDE_DIRS})
+include_directories(${GLEW_INCLUDE_DIRS})
+include_directories(${GLUT_INCLUDE_PATH})
+include_directories(${CUDA_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+link_directories(${ZED_LIBRARY_DIR})
+link_directories(${GLEW_LIBRARY_DIRS})
+link_directories(${GLUT_LIBRARY_DIRS})
+link_directories(${OpenGL_LIBRARY_DIRS})
+link_directories(${CUDA_LIBRARY_DIRS})
+
 # set(CMAKE_CXX_FLAGS "-Wall -c -O3 -lvrpn -lquat -pthread -std=c++11 ${CMAKE_C_FLAGS}")
 
 
@@ -45,6 +68,14 @@ target_link_libraries(jetson
     vn100
     vrpn
     Threads::Threads
+    ${ZED_LIBRARIES}
+    ${GLUT_LIBRARY}
+    ${GLEW_LIBRARY}
+    ${SPECIAL_OS_LIBS}
+    ${OPENGL_LIBRARIES}
+    ${CUDA_CUDA_LIBRARY} 
+    ${CUDA_CUDART_LIBRARY} 
+    ${CUDA_NPP_LIBRARIES_ZED}
 )
 target_compile_options(jetson PRIVATE -pthread -Wall -o -lrt -lm -lvrpn -lquat -pthread -lserialport -lsbp -O3 -std=c++11)
 
