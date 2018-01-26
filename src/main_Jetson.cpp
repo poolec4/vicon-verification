@@ -36,6 +36,8 @@ int  COMMAND_MODE=0;
 
 // ZED includes and definitions
 #include <sl/Camera.hpp>
+#include "TrackingViewer.hpp"
+
 sl::Camera zed;
 sl::Pose camera_pose;
 std::thread zed_callback;
@@ -119,7 +121,7 @@ void *zed_thread(void *thread_id)
 
 	printf("ZED: thread initialized..\n");
 
-	// Set configuration parameters for the ZED
+    // Set configuration parameters for the ZED
     InitParameters initParameters;
     initParameters.camera_resolution = RESOLUTION_HD720;
     initParameters.depth_mode = DEPTH_MODE_PERFORMANCE;
@@ -145,8 +147,15 @@ void *zed_thread(void *thread_id)
     // Start motion tracking
     zed.enableTracking(trackingParameters);
 
+    // Initialize OpenGL viewer
+    viewer.init(zed.getCameraInformation().camera_model);
+
     // Start ZED callback
     startZED();
+
+    // Set the display callback
+    glutCloseFunc(close);
+    glutMainLoop();
 
     return 0;
 
@@ -162,16 +171,36 @@ void startZED() {
 
 void run() {
 
+   
     float tx = 0, ty = 0, tz = 0;
     float rx = 0, ry = 0, rz = 0;
 
+    // Get the distance between the center of the camera and the left eye
     float translation_left_to_center = zed.getCameraInformation().calibration_parameters.T.x * 0.5f;
+
+    // Create text for GUI
+    char text_rotation[MAX_CHAR];
+    char text_translation[MAX_CHAR];
+
+    // Create a CSV file to log motion tracking data
+    std::ofstream outputFile;
+    std::string csvName = "Motion_data";
+    outputFile.open(csvName + ".csv");
+    if (!outputFile.is_open())
+        cout << "WARNING: Can't create CSV file. Run the application with administrator rights." << endl;
+    else
+        outputFile << "Timestamp(ns);Rotation_X(rad);Rotation_Y(rad);Rotation_Z(rad);Position_X(m);Position_Y(m);Position_Z(m);" << endl;
+
 
     while (!quit && zed.getSVOPosition() != zed.getSVONumberOfFrames() - 1) {
         if (zed.grab() == SUCCESS) {
+            // Get the position of the camera in a fixed reference frame (the World Frame)
             TRACKING_STATE tracking_state = zed.getPosition(camera_pose, sl::REFERENCE_FRAME_WORLD);
 
             if (tracking_state == TRACKING_STATE_OK) {
+                // getPosition() outputs the position of the Camera Frame, which is located on the left eye of the camera.
+                // To get the position of the center of the camera, we transform the pose data into a new frame located at the center of the camera.
+                // The generic formula used here is: Pose(new reference frame) = M.inverse() * Pose (camera frame) * M, where M is the transform between two frames.
                 transformPose(camera_pose.pose_data, translation_left_to_center); // Get the pose at the center of the camera (baseline/2 on X axis)
 
                 // Update camera position in the viewing window
@@ -185,7 +214,14 @@ void run() {
                 // Display translation and rotation (pitch, yaw, roll in OpenGL coordinate system)
                 snprintf(text_rotation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", rotation.x, rotation.y, rotation.z);
                 snprintf(text_translation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", translation.x, translation.y, translation.z);
+
+                // Save the pose data in a csv file
+                if (outputFile.is_open())
+                    outputFile << zed.getTimestamp(sl::TIME_REFERENCE::TIME_REFERENCE_IMAGE) << "; " << text_rotation << "; " << text_translation << ";" << endl;
             }
+
+            // Update rotation, translation and tracking state values in the OpenGL window
+            viewer.updateText(string(text_translation), string(text_rotation), tracking_state);
         } else sl::sleep_ms(1);
     }
 }
