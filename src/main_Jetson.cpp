@@ -26,7 +26,6 @@
 
 using Eigen::MatrixXd;
 using namespace std;
-using namespace sl;
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
@@ -37,13 +36,17 @@ int  COMMAND_MODE=0;
 // ZED includes and definitions
 #include <sl/Camera.hpp>
 #include "TrackingViewer.hpp"
-
+using namespace sl;
 sl::Camera zed;
 sl::Pose camera_pose;
 std::thread zed_callback;
 bool quit = false;
+// OpenGL window to display camera motion
+GLViewer viewer;
 
-#define NUM_THREADS 5
+const int MAX_CHAR = 128;
+
+#define NUM_THREADS 3
 
 pthread_mutex_t UAV_data_mutex;
 
