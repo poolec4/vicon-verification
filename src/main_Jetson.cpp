@@ -42,7 +42,7 @@ sl::Pose camera_pose;
 std::thread zed_callback;
 bool quit = false;
 // OpenGL window to display camera motion
-//GLViewer viewer;
+GLViewer viewer;
 
 const int MAX_CHAR = 128;
 
