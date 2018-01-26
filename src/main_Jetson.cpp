@@ -70,7 +70,7 @@ void run();
 void close();
 void transformPose(sl::Transform &pose, float tx);
 
-int main()
+int main(int argc, char **argv)
 {
 	pthread_t threads[NUM_THREADS];
 	pthread_attr_t attr;
@@ -98,31 +98,6 @@ int main()
 	fifo_mid_prio = (fifo_max_prio + fifo_min_prio) / 2;
 
 	printf("creating threads...\n");
-
-	param.sched_priority = fifo_max_prio;
-	pthread_attr_setschedparam(&attr, &param);
-	pthread_create(&threads[0], &attr, data_thread, (void *) 0);
-	pthread_create(&threads[1], &attr, vicon_thread, (void *) 0);
-	pthread_create(&threads[2], &attr, zed_thread, (void *) 0);
-
-	pthread_join(threads[0], NULL);
-	pthread_join(threads[1], NULL);
-	pthread_join(threads[2], NULL);
-
-	pthread_attr_destroy(&attr);
-	pthread_mutex_destroy(&UAV_data_mutex);
-
-	file_cfg.close();
-	printf("threads closed\n");
-
-	return 0;
-}
-
-
-void *zed_thread(void *thread_id, int argc, char **argv)
-{
-
-	printf("ZED: thread initialized..\n");
 
     // Set configuration parameters for the ZED
     InitParameters initParameters;
@@ -160,7 +135,31 @@ void *zed_thread(void *thread_id, int argc, char **argv)
     glutCloseFunc(close);
     glutMainLoop();
 
-    return 0;
+	param.sched_priority = fifo_max_prio;
+	pthread_attr_setschedparam(&attr, &param);
+	pthread_create(&threads[0], &attr, data_thread, (void *) 0);
+	pthread_create(&threads[1], &attr, vicon_thread, (void *) 0);
+	pthread_create(&threads[2], &attr, zed_thread, (void *) 0);
+
+	pthread_join(threads[0], NULL);
+	pthread_join(threads[1], NULL);
+	pthread_join(threads[2], NULL);
+
+	pthread_attr_destroy(&attr);
+	pthread_mutex_destroy(&UAV_data_mutex);
+
+	file_cfg.close();
+	printf("threads closed\n");
+
+	return 0;
+}
+
+
+void *zed_thread(void *thread_id)
+{
+
+	printf("ZED: thread initialized..\n");
+
 
 	printf("ZED: thread closing\n");
 	pthread_exit(NULL);
@@ -217,6 +216,9 @@ void run() {
                 // Display translation and rotation (pitch, yaw, roll in OpenGL coordinate system)
                 snprintf(text_rotation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", rotation.x, rotation.y, rotation.z);
                 snprintf(text_translation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", translation.x, translation.y, translation.z);
+
+                printf("%3.2f; %3.2f; %3.2f", rotation.x, rotation.y, rotation.z);
+                printf("%3.2f; %3.2f; %3.2f", translation.x, translation.y, translation.z);
 
                 // Save the pose data in a csv file
                 if (outputFile.is_open())
