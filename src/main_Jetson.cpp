@@ -75,6 +75,17 @@ int main()
 	init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP; // Use a right-handed Y-up coordinate system
 	init_params.coordinate_units = UNIT_METER; // Set units in meters
 
+	// Open ZED
+	err = zed.open(init_params);
+	if (err != SUCCESS)
+    	exit(-1);
+	
+	// Enable positional tracking with default parameters
+	sl::TrackingParameters tracking_parameters;
+	err =  = zed.enableTracking(tracking_parameters);
+	if (error != SUCCESS)
+	    exit(-1);
+	
 	// Initialize mutex and condition variables
 	pthread_mutex_init(&UAV_data_mutex, NULL);
 
