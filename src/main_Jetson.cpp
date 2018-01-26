@@ -127,10 +127,10 @@ void *zed_thread(void *thread_id)
 	        // Get the pose of the camera relative to the world frame
 	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
 	        // Display translation and timestamp
-	        printf("Translation: tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\r",
+	        printf("Translation: tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\n",
 	        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
 	        // Display orientation quaternion
-	        printf("Orientation: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\r",
+	        printf("Orientation: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
 	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
 		}
 	}
@@ -157,7 +157,10 @@ void *vicon_thread(void *thread_id)
 	cout << "fdcl_vicon: opened" << endl;
 
 	while(SYSTEM_ON==true)
+	{
 		VICON.loop();
+		printf("Vicon tx: %.3f".UAV.x_v)
+	}
 
 	VICON.close();
 	cout << "fdcl_vicon: closed" << endl;
