@@ -27,6 +27,7 @@
 using Eigen::MatrixXd;
 using namespace std;
 using namespace sl;
+sl::Camera zed;
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
@@ -69,7 +70,6 @@ int main()
 	CTRL.load_config(file_cfg);
 
 	// Set ZED parameters
-	sl::Camera zed;
 	InitParameters init_params;
 	init_params.camera_resolution = RESOLUTION_HD720; // Use HD720 video mode (default fps: 60)
 	init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP; // Use a right-handed Y-up coordinate system
@@ -134,7 +134,7 @@ void *zed_thread(void *thread_id)
 	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
 		}
 	}
-	
+
 	printf("ZED: thread closing\n");
 	pthread_exit(NULL);
 }
