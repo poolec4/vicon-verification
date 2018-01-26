@@ -116,7 +116,6 @@ int main()
 
 void *zed_thread(void *thread_id)
 {
-
 	printf("ZED: thread initialized..\n");
 
 	while(SYSTEM_ON == true)
@@ -133,7 +132,7 @@ void *zed_thread(void *thread_id)
 	        printf("Orientation: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
 	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
 
-			printf("Vicon tx: %.3f  ty: %.3f  tz: %.3f \n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
+			//printf("Vicon tx: %.3f  ty: %.3f  tz: %.3f \n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
 		}
 	}
 
