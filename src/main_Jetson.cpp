@@ -25,7 +25,6 @@
 #include "fdcl_vicon.h"
 
 using Eigen::MatrixXd;
-using namespace std;
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
@@ -36,13 +35,14 @@ int  COMMAND_MODE=0;
 // ZED includes and definitions
 #include <sl/Camera.hpp>
 #include "TrackingViewer.hpp"
+using namespace std;
 using namespace sl;
 sl::Camera zed;
 sl::Pose camera_pose;
 std::thread zed_callback;
 bool quit = false;
 // OpenGL window to display camera motion
-GLViewer viewer;
+//GLViewer viewer;
 
 const int MAX_CHAR = 128;
 
@@ -119,7 +119,7 @@ int main()
 }
 
 
-void *zed_thread(void *thread_id)
+void *zed_thread(void *thread_id, int argc, char **argv)
 {
 
 	printf("ZED: thread initialized..\n");
