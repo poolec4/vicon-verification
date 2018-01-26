@@ -29,6 +29,13 @@ include_directories(${PROJECT_SOURCE_DIR}/libraries/vectornav/include)
 include_directories(${PROJECT_SOURCE_DIR}/libraries/eigen)
 include_directories(${GTK3_INCLUDE_DIRS})
 
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 OLD)
+    cmake_policy(SET CMP0015 OLD)
+endif(COMMAND cmake_policy) 
+
+SET(EXECUTABLE_OUTPUT_PATH ".")
+
 find_package(ZED 2 REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)

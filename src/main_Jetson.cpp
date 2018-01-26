@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <iostream>
 #include <fstream>
+#include <sl/Camera.hpp>
 
 #include "Eigen/Dense"
 
@@ -23,6 +24,7 @@
 #include "fdcl_EKF.h"
 #include "fdcl_vn100.h"
 #include "fdcl_vicon.h"
+#include "TrackingViewer.hpp"
 
 using Eigen::MatrixXd;
 
@@ -33,8 +35,7 @@ bool CALIBRATE_DONE=false;
 int  COMMAND_MODE=0;
 
 // ZED includes and definitions
-#include <sl/Camera.hpp>
-#include "TrackingViewer.hpp"
+
 using namespace std;
 using namespace sl;
 sl::Camera zed;
@@ -70,7 +71,7 @@ void run();
 void close();
 void transformPose(sl::Transform &pose, float tx);
 
-int main(int argc, char **argv)
+int main()
 {
 	pthread_t threads[NUM_THREADS];
 	pthread_attr_t attr;
@@ -106,16 +107,6 @@ int main(int argc, char **argv)
     initParameters.coordinate_units = UNIT_METER;
     initParameters.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
 
-    if (argc > 1 && std::string(argv[1]).find(".svo"))
-        initParameters.svo_input_filename.set(argv[1]);
-
-    // Open the camera
-    ERROR_CODE err = zed.open(initParameters);
-    if (err != sl::SUCCESS) {
-        std::cout << sl::toString(err) << std::endl;
-        zed.close();
-        return 1; // Quit if an error occurred
-    }
 
     // Set positional tracking parameters
     TrackingParameters trackingParameters;
@@ -129,7 +120,7 @@ int main(int argc, char **argv)
     viewer.init(zed.getCameraInformation().camera_model);
 
     // Start ZED callback
-    startZED();
+    //startZED();
 
     // Set the display callback
     glutCloseFunc(close);
@@ -160,21 +151,7 @@ void *zed_thread(void *thread_id)
 
 	printf("ZED: thread initialized..\n");
 
-
-	printf("ZED: thread closing\n");
-	pthread_exit(NULL);
-
-}
-
-void startZED() {
-    quit = false;
-    zed_callback = std::thread(run);
-}
-
-void run() {
-
-   
-    float tx = 0, ty = 0, tz = 0;
+     float tx = 0, ty = 0, tz = 0;
     float rx = 0, ry = 0, rz = 0;
 
     // Get the distance between the center of the camera and the left eye
@@ -229,7 +206,12 @@ void run() {
             viewer.updateText(string(text_translation), string(text_rotation), tracking_state);
         } else sl::sleep_ms(1);
     }
+
+	printf("ZED: thread closing\n");
+	pthread_exit(NULL);
+
 }
+
 
 void transformPose(sl::Transform &pose, float tx) {
     sl::Transform transform_;
