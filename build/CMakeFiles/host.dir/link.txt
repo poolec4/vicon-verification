@@ -1,0 +1,2 @@
+/usr/bin/ar qc libhost.a  CMakeFiles/host.dir/src/fdcl_serial.cpp.o CMakeFiles/host.dir/src/fdcl_wifi.cpp.o CMakeFiles/host.dir/src/fdcl_param.cpp.o CMakeFiles/host.dir/src/fdcl_save.cpp.o
+/usr/bin/ranlib libhost.a

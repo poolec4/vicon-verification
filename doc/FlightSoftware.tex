@@ -1,0 +1,732 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,text={6.5in,9in},centering]{geometry}
+\usepackage{amssymb,amsmath,graphicx,subfigure,setspace,url,wrapfig}
+\usepackage[footnotesize]{caption}
+%\bibliographystyle{unsrtnat}
+\usepackage[numbers,sort&compress]{natbib}
+%\usepackage[numbers,compress]{natbib}
+%\usepackage{uarial}
+\usepackage[compact]{titlesec}
+\usepackage{color}
+\usepackage{times}
+\usepackage{curves,pgfgantt}
+\usepackage{pdfpages}
+
+%\renewcommand{\rmdefault}{phv} % Arial
+%\renewcommand{\sfdefault}{phv} % Arial
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\abs}[1]{\ensuremath{\left| #1 \right|}}
+\newcommand{\bracket}[1]{\ensuremath{\left[ #1 \right]}}
+\newcommand{\braces}[1]{\ensuremath{\left\{ #1 \right\}}}
+\newcommand{\parenth}[1]{\ensuremath{\left( #1 \right)}}
+\newcommand{\ip}[1]{\ensuremath{\langle #1 \rangle}}
+\newcommand{\tr}[1]{\mbox{tr}\ensuremath{\!\bracket{#1}}}
+\newcommand{\deriv}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}}
+\newcommand{\SO}{\ensuremath{\mathsf{SO(3)}}}
+\newcommand{\T}{\ensuremath{\mathsf{T}}}
+\newcommand{\G}{\ensuremath{\mathsf{G}}}
+\newcommand{\Q}{\ensuremath{\mathsf{Q}}}
+\renewcommand{\L}{\ensuremath{\mathsf{L}}}
+\newcommand{\R}{\ensuremath{\mathsf{R}}}
+\newcommand{\I}{\ensuremath{\mathsf{I}}}
+\newcommand{\so}{\ensuremath{\mathfrak{so}(3)}}
+\newcommand{\SE}{\ensuremath{\mathsf{SE(3)}}}
+\newcommand{\se}{\ensuremath{\mathfrak{se}(3)}}
+\renewcommand{\Re}{\ensuremath{\mathbb{R}}}
+\newcommand{\Sph}{\ensuremath{\mathsf{S}}}
+\newcommand{\aSE}[2]{\ensuremath{\begin{bmatrix}#1&#2\\0&1\end{bmatrix}}}
+\newcommand{\ase}[2]{\ensuremath{\begin{bmatrix}#1&#2\\0&0\end{bmatrix}}}
+\newcommand{\D}{\ensuremath{\mathbf{D}}}
+\newcommand{\pair}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\met}[1]{\ensuremath{\langle\!\langle #1 \rangle\!\rangle}}
+\newcommand{\Ad}{\ensuremath{\mathrm{Ad}}}
+\newcommand{\ad}{\ensuremath{\mathrm{ad}}}
+\newcommand{\g}{\ensuremath{\mathfrak{g}}}
+\newcommand{\intp}{\ensuremath{\mathbf{i}}}
+\newcommand{\extd}{\ensuremath{\mathbf{d}}}
+\newcommand{\Hor}{\ensuremath{\mathrm{Hor}}}
+\newcommand{\Ver}{\ensuremath{\mathrm{Ver}}}
+\newcommand{\dyn}{\ensuremath{\mathrm{dyn}}}
+\newcommand{\geo}{\ensuremath{\mathrm{geo}}}
+
+\newcommand{\refeqn}[1]{(\ref{eqn:#1})}
+\newcommand{\reffig}[1]{Fig. \ref{fig:#1}}
+
+\newcommand{\bfi}{\bfseries\itshape}
+\graphicspath{{./Figs/},{./Matlab/}}
+
+%% url smaller font.
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+\urlstyle{leo}
+
+\renewcommand{\baselinestretch}{1.15}
+\date{}
+
+\setlength{\abovecaptionskip}{0.1cm}
+\setlength{\belowcaptionskip}{-0.2cm}
+
+\titlespacing*{\section}{0pt}{*2.25}{*0.75}
+\titlespacing*{\subsection}{0pt}{*2.0}{*0.75}
+\titlespacing*{\subsubsection}{0pt}{*1.75}{*0.75}
+%\titlespacing*{\paragraph}{0pt}{*1.0}{*0.5}
+
+
+%	
+%3.5 Broader Impact
+%	Integration of Teaching and Research		
+%		New Course Development
+%		Monograph
+%		Undergraduate Research Program
+%				
+%	Outreach and Research Dissemination
+%		Partnership with K-12 Robotics Groups
+%		Government and Industry
+%		
+%		
+%	
+%0.5 Results from previous grant
+
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\w}{\mathbf{w}}
+\renewcommand{\a}{\mathbf{a}}
+
+\begin{document}
+
+%\setlength{\rightskip}{0pt plus 2cm}
+\bibliographystyle{abbrvnat}
+
+%\clearpage\newpage\setcounter{page}{1}\pagestyle{plain}
+
+\noindent{\Large\textbf{FDCL UAV Flight Software}}
+
+\vspace*{0.5cm}
+
+
+\section{Reference Frames}
+
+There are six! reference frames formulated. Understanding the definition of each frame, and converting between these frames precisely are critical for successful flight experiments. 
+
+\subsection{Frames Fixed to UAV}
+
+\paragraph{UAV body-fixed frame: $b$} This corresponds to the body-fixed frame defined in~\cite{LeeLeoPICDC10}. The center of rotor is numbered counterclockwise when observed from the top. The origin of the $b$-frame is located at the mass center of the UAV, and the first axis points toward the first rotor, and the second axis points toward the second rotor. Thus, the third axis points downward. 
+
+\paragraph{IMU-fixed frame: $i$} This corresponds to the frame marked on the surface of the IMU. 
+
+\paragraph{VICON object markers frame: $m$} When creating an object from the VICON tracker software, a reference frame fixed to the marker is defined. The orientation of this frame is identical to the above $v$-frame at the time of object creation. Therefore, it is common that the object is aligned in a specific desired way with respect to the $v$-frame.
+
+
+\subsection{Framed Fixed to Ground}
+
+
+\paragraph{Local NED frame: $n$} This frame is common in flight dynamics. Its origin is located at the base station. Three axes points toward the due North, the due East, and downward, respectively. 
+
+\paragraph{VICON reference frame: $v$} This corresponds to the \textit{world} frame of the VICON system. It is determined when calibrating the VICON sensors with the marker wand. At SEH2200, there is a black elected tape marked on the floor. The first axis points toward the right when sitting at the base station, or the 22nd street; the second axis points front when sitting at the base station, or toward the I street; the third axis points upward.
+
+\paragraph{FDCL SEH2200 frame: $f$} This frame is fixed to SEH2200, and its origin is identical to the origin of the $v$-frame. The first axis points front when sitting at the base station, or toward the I street; the second axis points toward the right when sitting at the base station, or the 22nd street; the third axis points downward. 
+
+
+\subsection{Conversion between Frames}
+
+\paragraph{Conversion among UAV-fixed frames}
+
+Conversion among the three UAV-fixed frames do not change over time, as all of them are fixed to the UAV body. 
+
+It will be convenient if the IMU is aligned to the UAV body so that $R_{bi}\in\SO$, i.e., the transform from the $i$-frame to the $b$-frame is identical, or a $\frac{\pi}{2}n$ rotation about a $b$-frame axis. However, in practice, it is challenging to align the IMU in such way. However, the IMU orientation can be precisely determined when designing the layout of the PCB board. As such, the rotation matrix $R_{bi}\in\SO$ will be visually determined. 
+
+As discussed above, the orientation of the $m$-frame relative to the $b$-frame can be determined when creating the VICON object upon the error in aligning the UAV to the black tapes on the floor. 
+
+As both of the IMU and the VICON measures attitudes, the rotation matrix $R_{mi}\in\SO$ from the $i$-frame to the $m$-frame can be calibrated as described in Section \ref{sec:Calib}.
+
+
+\paragraph{Conversion among ground-fixed frames} Conversion among the three ground-fixed frames do not change over time, as all of them are fixed to the ground.
+
+The conversion between the $v$-frame and the $f$-frame is trivial, as the $f$-frame is constructed by flipping the $v$-frame. More explicitly, 
+\begin{equation}
+R_{fv} = [e_2, e_1, -e_3] = 
+\begin{bmatrix}
+0 & 1 & 0\\
+1 & 0 & 0 \\
+0 & 0 & -1
+\end{bmatrix},\quad
+R_{vf} = R_{fv}^T = R_{fv}.
+\end{equation}
+
+The conversion between the $n$-frame and the $v$-frame is not straightforward, as the magnetic field in SEH2200 is neither uniform nor stationary. However, as both of the IMU and the VICON measures attitudes, the rotation matrix $R_{nv}\in\SO$ from the $v$-frame to the $n$-frame can be calibrated as described in Section \ref{sec:Calib}.
+
+
+\paragraph{Conversion between a UAV-fixed frame and a ground-fixed frame} In contrast to the two types conversion described above, the conversion between a UAV-fixed frame and a ground-fixed frame depends on the actual attitude of the UAV with respect to the ground. 
+
+Two types of measurements are available. 
+\begin{itemize}
+\item $R_{ni}(t)\in\SO$ is measured by IMU. There are several ways to convert Euler-angles to the corresponding rotation matrix. The following equations should be used for VN100.
+{\footnotesize\selectfont\begin{verbatim}
+	YPR(0)=data->ypr.yaw*M_PI/180.;
+	YPR(1)=data->ypr.pitch*M_PI/180.;
+	YPR(2)=data->ypr.roll*M_PI/180.;
+
+	R_ni(0,0)=cos(YPR(0))*cos(YPR(1));
+	R_ni(0,1)=cos(YPR(0))*sin(YPR(2))*sin(YPR(1)) - cos(YPR(2))*sin(YPR(0));
+	R_ni(0,2)=sin(YPR(0))*sin(YPR(2)) + cos(YPR(0))*cos(YPR(2))*sin(YPR(1));
+	R_ni(1,0)=cos(YPR(1))*sin(YPR(0));
+	R_ni(1,1)=cos(YPR(0))*cos(YPR(2)) + sin(YPR(0))*sin(YPR(2))*sin(YPR(1));
+	R_ni(1,2)=cos(YPR(2))*sin(YPR(0))*sin(YPR(1)) - cos(YPR(0))*sin(YPR(2));
+	R_ni(2,0)=-sin(YPR(1));
+	R_ni(2,1)=cos(YPR(1))*sin(YPR(2));
+	R_ni(2,2)=cos(YPR(2))*cos(YPR(1));	
+\end{verbatim}}
+
+
+
+
+\item $R_{vm}(t)\in\SO$ is measured by VICON. There are several ways to convert a quaternion to the corresponding rotation matrix. The following equations should be used for VICON VRPN. 
+
+{\footnotesize\selectfont\begin{verbatim}
+R_vm(0,0) = 1-(2*(tdata.quat[1])*(tdata.quat[1]))-(2*(tdata.quat[2])*(tdata.quat[2]));
+R_vm(0,1) = (2*tdata.quat[0]*tdata.quat[1])-(2*tdata.quat[3]*tdata.quat[2]);
+R_vm(0,2) = (2*tdata.quat[0]*tdata.quat[2])+(2*tdata.quat[3]*tdata.quat[1]);
+R_vm(1,0) = (2*tdata.quat[0]*tdata.quat[1])+(2*tdata.quat[3]*tdata.quat[2]);
+R_vm(1,1) = 1-(2*(tdata.quat[0])*(tdata.quat[0]))-(2*(tdata.quat[2])*(tdata.quat[2]));
+R_vm(1,2) = (2*(tdata.quat[1])*(tdata.quat[2]))-(2*(tdata.quat[3])*(tdata.quat[0]));
+R_vm(2,0) = (2*tdata.quat[0]*tdata.quat[2])-(2*tdata.quat[3]*tdata.quat[1]);
+R_vm(2,1) = (2*tdata.quat[0]*tdata.quat[3])+(2*tdata.quat[2]*tdata.quat[1]);
+R_vm(2,2) = 1-(2*(tdata.quat[0])*(tdata.quat[0]))-(2*(tdata.quat[1])*(tdata.quat[1]));
+\end{verbatim}}
+\end{itemize}
+
+
+\subsection{REFERENCE FRAME SELECTION: IMPORTANT}
+
+In indoor flight experiments at SEH2200, we use the following two reference frames:
+
+\begin{itemize}
+\item The body-fixed frame, or the $b$-frame, as the UAV-fixed frame.
+\item The FDCL SEH2200 frame, or the $f$-frame, as the ground-fixed frame. 
+\end{itemize}
+
+\noindent In the implementation of the controller or the generation of tracking commands, 
+
+\begin{itemize}
+\item $x\in\Re^3$ is the position of the origin of the $b$-frame, or the center of gravity of the UAV, resolved in the $f$-frame. 
+\item  $v=\dot x\in\Re^3$.
+\item $R\triangleq R_{fb}\in\SO$ is the rotation matrix from the $b$-frame to the $f$-frame. 
+\item $\Omega\in\Re^3$ is the angular velocity resolved in the $b$-frame. 
+\end{itemize}
+
+\newcommand{\IMU}{\mathrm{IMU}}
+\paragraph{IMU} The output of the IMU corresponds to $(R_\IMU, \Omega_\IMU, a_\IMU)=(R_{ni},\Omega_{i},a_{\mathrm{IMU}})$, where $a_{\mathrm{IMU}}$ is the relative acceleration with respect to the gravitational acceleration resolved in the $i$-frame. They can be converted into $(R,\Omega,a)$ as
+\begin{align}
+R(t) & =R_{fb}(t) =  R_{fv} R_{vn} R_{ni}(t) R_{ib},\\
+\dot R(t) & = R_{fv} R_{vn} R_{ni}(t)\hat\Omega_i(t) R_{ib}
+=R_{fv} R_{vn} R_{ni}(t) R_{ib} \widehat{R_{ib}^T\Omega_i(t)}=R(t)\widehat{R_{ib}^T\Omega_i(t)}=R(t)\hat\Omega(t)
+\\
+\Omega(t) & = \Omega_b(t) =  R_{bi} \Omega_i(t),\\
+a(t) & =\ddot x(t) = R_{fi}(t)a_{\mathrm{IMU}}+ge_3 = R_{fv}R_{vn} R_{ni}(t) a_{\mathrm{IMU}}+ge_3=R_{fb}(t) R_{bi} a_{\mathrm{IMU}} + ge_3.
+\end{align}
+
+\paragraph{VICON} The output of the VICON measurements corresponds to $(x_v,R_{vm})$. They can be converted into $(x,R)$ as
+\begin{align}
+x(t) & = x_f(t) = R_{fv} x_v(t),\\
+R(t) & = R_{fb}(t) =    R_{fv} R_{vm}(t) R_{mb}.
+\end{align}
+
+
+\section{VICON and IMU Calibration}\label{sec:Calib}
+
+This section describes computational algorithms to identify two fixed rotation matrices $R_{nv},R_{mi}\in\SO$. 
+
+\paragraph{Problem Formulation} 
+
+The IMU measures $R_{ni}\in\SO$ which represents the linear transformation of a representation of a vector from the $i$-frame to the $n$-frame, and the VICON measures $R_{vm}\in\SO$ that is the rotation matrix from the $m$-frame to the $v$-frame. They are related as
+\begin{equation}\label{eqn:R_conv}
+R_{ni}(t) =  R_{nv} R_{vm}(t) R_{mi},
+\end{equation}
+where $R_{mi}\in\SO$ is the fixed rotation matrix from the $i$-frame to the $m$-frame, and $R_{nv}\in\SO$ is the fixed rotation matrix from the $v$-frame to the $n$-frame.
+
+The objective of this section is to compute $R_{mi}$ and $R_{nv}$ for several measurements of $\{(R_{ni}(t),R_{vm}(t))\in\SO\times\SO\,|\, t\in\{t_1,t_2,\ldots t_N\}\}$ for a positive integer $N\geq 2$.
+
+\paragraph{Wahba's Problem}
+For notational convenience, let
+\[
+R=R_{ni},\quad Q=R_{vm},\quad R_{nv}=X,\quad R_{mi}=Y.
+\]
+Using these, \refeqn{R_conv} can be rewritten for two sets of measurements as 
+\[
+R_i = X Q_i Y,\quad R_j = X Q_j Y,
+\]
+for $i,j\in\{1,\ldots,N\}$. We have $Y= Q_j^T X^T R_j$ from the second equation. Substituting it into the first one,
+\[
+R_i = X Q_i Q_j^T X^T R_j,
+\]
+which is rearranged 
+\begin{equation}\label{eqn:R_conv_X}
+R_i R_j^T = X Q_i Q_j^T X^T,
+\end{equation}
+which follows the form of $A=XBX^T$, or equivalently $AX=XB$, that is an equation well-known in sensor calibrations. 
+
+We solve it using the matrix exponential. Define $r_{ij},q_{ij}\in\Re^3$ such that
+\begin{equation}\label{eqn:rq}
+R_i R_j^T = \exp\hat r_{ij},\quad Q_iQ_j^T = \exp \hat q_{ij}.
+\end{equation}
+Using this, \refeqn{R_conv_X} is rewritten as $\exp\hat r_{ij} = X \exp\hat q_{ij} X^T =\exp(\widehat{Xq_{ij}})$, which is equivalent to
+\begin{equation}\label{eqn:r_conv}
+r_{ij} = X q_{ij}. 
+\end{equation}
+
+The problem of finding $X\in\SO$ for given $\{(r_{ij},q_{ij})\in\Re^3\times \Re^3\,|\,i,j\in\{1,\ldots,N\}\}$ has been investigated in the field of attitude determination. In particular, the least-square determination approach is recognized as Wahba's problem. 
+
+One of the most popular solution to Wahba's problem is based on the singular value decomposition. Define the matrix $Z\in\Re^{3\times 3}$ as
+\begin{equation}\label{eqn:Z}
+Z=\sum_{i,j=1}^N w_{ij} r_{ij}q_{ij}^T,
+\end{equation}
+where $w_{ij}\in\Re$ denotes a positive weighting parameters. Let the singular value decomposition of $Z$ be $Z=USV^T$. The least-square solution of \refeqn{r_conv} minimizing $\mathcal{J} = \sum_{i,j=1}^N w_{ij}\|r_{ij} - X q_{ij}\|^2$ is given by
+\begin{equation}
+X = U\,\mathrm{diag}[1,1,\mathrm{det}[U]\mathrm{det}[V]]\, V^T.
+\end{equation}
+
+\paragraph{Compute $R_{nv}$} In summary, the rotation matrix from the $v$-frame to the $n$-frame, namely $X=R_{nv}\in\SO$ is determined by
+\begin{enumerate}
+\item Collect $\{(R_{ni}(t),R_{vm}(t))\in\SO\times\SO\,|\, t\in\{t_1,t_2,\ldots t_N\}\}$.
+\item Define $\{(r_{ij},q_{ij})\in\Re^3\times \Re^3\,|\,i,j\in\{1,\ldots,N\}\}$ from \refeqn{rq}.
+\item Define $Z$ as \refeqn{Z}, and perform singular value decomposition to obtain $Z=USV^T$.
+\item We have 
+$R_{nv}= U\,\mathrm{diag}[1,1,\mathrm{det}[U]\mathrm{det}[V]]\, V^T$.
+\end{enumerate}
+
+\paragraph{Compute $R_{mi}$} The rotation matrix $Y=R_{mi}$ can be constructed directly by using the above solution via $Y= Q_j^T X^T R_j$ for any $j\in\{1,\ldots,N\}$. In order to compute $R_{mi}$ in the lease-square sense, the above procedure can be repeated as follows. 
+
+We have $X=R_jY^T Q_j^T$, which yield $R_i = R_jY^T Q_j^T Q_i Y$ that is equivalent to
+\[
+R_j^TR_i = Y^T Q_j^T Q_i Y,
+\]
+which is comparable to \refeqn{R_conv_X}. As such, the procedure to compute $X$ can be repeated by using the following definition of $r_{ij},q_{ij}$ instead of \refeqn{rq},
+\begin{equation}\label{eqn:rq_Y}
+R_j^T R_i = \exp\hat r_{ij},\quad Q_j^TQ_i = \exp \hat q_{ij}.
+\end{equation}
+
+In summary, the rotation matrix from the $i$-frame to the $m$-frame, namely $Y=R_{mi}\in\SO$ is determined by
+\begin{enumerate}
+\item Collect $\{(R_{ni}(t),R_{vm}(t))\in\SO\times\SO\,|\, t\in\{t_1,t_2,\ldots t_N\}\}$.
+\item Define $\{(r_{ij},q_{ij})\in\Re^3\times \Re^3\,|\,i,j\in\{1,\ldots,N\}\}$ from \refeqn{rq_Y}.
+\item Define $Z$ as \refeqn{Z}, and perform singular value decomposition to obtain $Z=USV^T$.
+\item We have 
+$R_{mi}= V\,\mathrm{diag}[1,1,\mathrm{det}[U]\mathrm{det}[V]]\, U^T$.
+\end{enumerate}
+
+
+
+\section{State Estimation}
+
+
+\subsection{Equations of Motion}
+
+The equations of motion for $(x,v,R)$ are given by 
+\begin{align}
+\dot x & = v,\label{eqn:x_dot}\\
+\dot v & = a =R R_{bi} (a_{\mathrm{IMU}}+b_a+w_a) + ge_3,\\
+\dot R & = R\hat\Omega = R(R_{bi}(\Omega_{\mathrm{IMU}}+b_\Omega+w_\Omega))^\wedge,\label{eqn:R_dot}\\
+\dot b_a & = w_{b_a}\label{eqn:ba_dot},\\
+\dot b_\Omega &  = w_{b_\Omega},\label{eqn:bW_dot}
+\end{align}
+where the acceleration measurement and the angular velocity measurements, namely $(a_{\IMU},\Omega_\IMU)$ are treated as an exogenous time-varying signal. As such, the measurement noise for the acceleration and the angular velocity, namely $w_a,w_\Omega\in\Re^3$ are considered as the process noise, instead of the measurement noise in the formulation of the estimator. The above equation also includes the bias $b_a,b_\Omega\in\Re^3$ in the angular velocity measurement and the acceleration measurement. More specifically
+\begin{align}
+a &= R R_{bi} (a_\IMU+ b_a +w_a) + g e_3,\\
+\Omega &= R_{bi}(\Omega_\IMU + b_\Omega  + w_\Omega). 
+\end{align}
+
+Let $(\delta x ,\delta v, \delta R = R\hat\eta,\delta b_a,\delta b_\Omega)$ be the perturbation of the state for $\eta\in\Re^3$, from the ideal case of the absence of noise.  After ignoring the higher order terms of perturbations and noise, the linearized equations of motion for $\delta x, \delta v, \delta b_a, \delta b_\Omega$ are given by
+\begin{align*}
+\delta \dot x & = \delta v,\\
+\delta \dot v & = R \hat \eta R_{bi} (a_{\mathrm{IMU}}+b_a)+ R R_{bi} (\delta b_a +w_a)
+= -R(R_{bi} (a_{\mathrm{IMU}}+b_a))^\wedge \eta + R R_{bi} \delta b_a + R R_{bi} w_a,\\
+\delta \dot b_a & = w_{b_a},\\
+\delta \dot b_\Omega & = w_{b_\Omega}.
+\end{align*}
+Also the perturbation of \refeqn{R_dot} is written as
+\begin{align*}
+\frac{d}{dt}(\delta R) & =\frac{d}{dt}(R\hat\eta)= R\hat\Omega\hat\eta + R\hat{\dot\eta}
+= R(R_{bi}(\Omega_\IMU + b_\Omega))^\wedge\hat\eta + R\hat{\dot\eta}\\
+= \delta (\dot R) & = R\hat\eta(R_{bi}(\Omega_\IMU+b_\Omega))^\wedge + R(R_{bi}\delta b_\Omega)^\wedge+ R(R_{bi}w_\Omega)^\wedge,
+\end{align*}
+which yields
+\begin{align*}
+\dot\eta = -(R_{bi}(\Omega_{\mathrm{IMU}}+b_\Omega))^\wedge\eta+R_{bi}\delta b_\Omega + R_{bi}w_\Omega, 
+\end{align*}
+after ignoring the higher-order terms of the process noise and the perturbation. 
+
+The linearized equations of motion are rearranged into a matrix form with $\x=[\delta x; \delta v; \eta; \delta b_a;\delta b_\Omega]\in\Re^{15}$ and $\w=[w_a; w_\Omega; w_{b_a}; w_{b_\Omega}]\in\Re^{12}$  as
+\begin{align}
+\dot{\x} &= 
+\begin{bmatrix} 0 & I_{3\times 3} & 0 & 0 & 0 \\
+0 & 0 & -R(R_{bi}(a_{\mathrm{IMU}}+b_a))^\wedge & R R_{bi} & 0\\
+0 & 0 & -(R_{bi}(\Omega_{\mathrm{IMU}}+b_\Omega))^\wedge & 0 & R_{bi} \\
+0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+\x 
++
+\begin{bmatrix}
+0 & 0  & 0 & 0 \\
+R R_{bi} & 0 & 0 & 0 \\
+0 & R_{bi} & 0 & 0 \\
+0 & 0 & I_{3\times 3} & 0 \\
+0 & 0 & 0 & I_{3\times 3}
+\end{bmatrix}
+\w\nonumber\\
+&\triangleq  A(t)\x + F(t)\w.
+\end{align}
+
+\subsection{Prediction} 
+
+\paragraph{Mean}
+Let $h_k=t_{k}-t_{k-1}$ be the discrete time step. The mean values $(\bar x, \bar v, \bar R)$ are updated by discretizing \refeqn{x_dot}--\refeqn{R_dot} in the absence of the process noise via the following second order explicit method:
+\begin{align}
+\bar R_{k} & = \bar R_{k-1} \exp\braces{\frac{h_k}{2} (\bar\Omega_{k-1}+\bar\Omega_k)^\wedge},\\
+\bar x_k & = \bar x_{k-1} + h_k \bar v_{k-1} +\frac{h_k^2}{2}\bar a_{k-1},\\
+\bar v_k & = \bar v_{k-1} + \frac{h_k}{2} (\bar a_{k-1} + \bar a_k),\\
+\bar b_{a_k} & = \bar b_{a_{k-1}},\\
+\bar b_{\Omega_k} & = \bar b_{\Omega_{k-1}},
+\end{align}
+with
+\begin{align}
+\bar \Omega_k &= R_{bi}(\Omega_{\IMU_k} + b_{\Omega_k}),\label{eqn:W_bar}\\
+\bar a_k &=  \bar R_{k}R_{bi}(a_{\mathrm{IMU}_{k}}+b_{k}) + g e_3.
+\end{align}
+
+\paragraph{Covariance}
+
+The linearized equation is discretized according to~\cite[p 330]{Bro91} as
+\begin{equation}
+\x_{k} = A_{k-1} \x_{k-1} + F_{k-1} \w_{k-1},
+\end{equation}
+where
+\begin{align}
+A_{k-1} & = I_{15\times 15} + h_k A(t_{k-1}) \Psi,\\
+F_{k-1} & = h_k \Psi F(t_{k-1}),\\
+\Psi & = I_{15\times 15} + \frac{h_k}{2} A(t_{k-1}) \parenth{ I + \frac{h_k}{3} A(t_{k-1})\parenth{I+\cdots\parenth{I+\frac{h_k}{N}A(t_{k-1})}}}.
+\end{align}
+
+Let the covariance of $\x_k$ be $P_k\in\Re^{15\times 15}$ and let the covariance of $\w_k$ be $Q_k\in\Re^{12\times 12}$. It is updated as
+\begin{equation}
+P_k = A_{k-1} P_{k-1} A_{k-1}^T + F_{k-1} Q_{k-1} F_{k-1}^T. 
+\end{equation}
+
+
+\subsection{Correction by IMU}
+
+
+
+In addition to $(\Omega_{\IMU}, a_{\IMU})$, the IMU measures $R_{ni}$. The measurement equation is given by
+\[
+R_{\IMU} = R_{nv} R_{vf} R R_{bi} \exp \hat \zeta.
+\]
+where $\zeta\in\Re^3$ denotes the measurement noise for $R_\IMU$. The estimation of the IMU measurement is given by
+\[
+\bar R_{\IMU} = R_{nv} R_{vf} \bar R R_{bi}.
+\]
+The difference between $R_{\IMU}$ and $\bar R_{\IMU}$ is referred to as the residual error, which is formulated by $\eta,\zeta\in\Re^3$ as
+\begin{align*}
+R_{\IMU} & = R_{nv} R_{vf} \bar R \exp \hat\eta R_{bi} \exp\hat\zeta\\
+& = R_{nv} R_{vf} \bar R  R_{bi} + R_{nv} R_{vf} \bar R \hat\eta R_{bi} + R_{nv} R_{vf} \bar R  R_{bi}\hat\zeta,
+\end{align*}
+for small $\eta$ and $\zeta$, which is rearranged into
+\[
+\bar R^T R_{vf}^T R_{nv}^T R_{\IMU}R_{bi}^T =  I_{3\times 3}   +   \hat\eta  +  \widehat{R_{bi}\zeta},
+\]
+which yields
+\[
+(\bar R^T R_{vf}^T R_{nv}^T R_{\IMU}R_{bi}^T-I_{3\times 3})^\vee = \eta  + R_{bi}\zeta.
+\]
+In practice, $\bar R^T R_{vf}^T R_{nv}^T R_{\IMU}R_{bi}^T -I_{3\times 3}$ may not be skew-symmetric. After projecting it to the space of skew-symmetric matrices,
+\begin{equation}
+\frac{1}{2}(\bar R^T R_{vf}^T R_{nv}^T R_{\IMU}R_{bi}^T- R_{bi}R_{\IMU}^T R_{nv} R_{vf} \bar R)^\vee =\delta z= \eta + R_{bi}\zeta = H \x + R_{bi}\zeta,
+\end{equation}
+where $H=[0_{3\times 3}, 0_{3\times 3}, I_{3\times 3}, 0_{3\times 3}, 0_{3\times 3}]\in\Re^{3\times 15}$.
+
+\paragraph{Observability}
+For given discrete approximation, we have
+\begin{align*}
+H \Phi(t_1,t_0) &= H A_0 = H(I_{15\times 15}+ hA(t_0))\\
+&  = [0,0, I+hA_{33}(t_0), 0, hR_bi],\\
+H \Phi(t_2,t_0) &= H A_1 A_0 = [0,0, I+hA_{33}(t_1), 0, hR_bi]A_0,\\
+& =[0,0, (I+hA_{33}(t_1))(I+hA_{33}(t_0)), 0 ,(I+hA_{33}(t_1))hR_{bi}],\\
+& \vdots
+\end{align*}
+As such it is clear that $(\delta x, \delta v, \delta b_a)$ are not observable from the IMU measurement $R_{ni}$. 
+
+Define $T\in\Re^{15\times 15}$ as
+\[
+T=\begin{bmatrix}
+0_{3\times 3}& 0_{3\times 3}& I_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}\\
+0_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}& I_{3\times 3}\\
+I_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}\\
+0_{3\times 3}& I_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}\\
+0_{3\times 3}& 0_{3\times 3}& 0_{3\times 3}& I_{3\times 3}& 0_{3\times 3}
+\end{bmatrix}.
+\]
+with $T^{-1}=T$. Let $\chi=Tx\in\Re^{15}$. We have the similarity transform, $\bar A = TAT^{-1}$, $\bar F = TF$, and $\bar H = HT^{-1}$,
+\begin{align}
+\dot{\chi} &= 
+\begin{bmatrix}
+-(R_{bi}(\Omega_{\mathrm{IMU}}+b_\Omega))^\wedge & R_{bi} & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & I_{3\times 3} & 0\\
+-R(R_{bi}(a_{\mathrm{IMU}}+b_a))^\wedge & 0 & 0 & 0 & R R_{bi}\\
+0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+\chi 
++
+\begin{bmatrix}
+0 & R_{bi} & 0 & 0 \\
+0 & 0 & 0 & I_{3\times 3}\\
+0 & 0  & 0 & 0 \\
+R R_{bi} & 0 & 0 & 0 \\
+0 & 0 & I_{3\times 3} & 0 \\
+\end{bmatrix}
+\w\nonumber\\
+&\triangleq  \bar A(t)\chi + \bar F(t)\w,\\
+\delta z & = \begin{bmatrix} I_{3\times 3} & 0 & 0 & 0 & 0\end{bmatrix}\chi\\
+& \triangleq \bar H \chi,
+\end{align}
+
+The first six elements of $\chi$, namely $\chi_o = T_o[\eta, \delta\Omega]\in\Re^6$ corresponds to the observable subspace, where $T_0\in\Re^{6\times 15}$ is
+\[
+T_o = \begin{bmatrix} 
+I_{3\times 3} & 0 & 0 & 0 & 0\\
+0 & I_{3\times 3} & 0 & 0 & 0
+\end{bmatrix}.
+\]
+And it is governed by
+\begin{align}
+\dot{\chi}_o &= 
+(T_o \bar A(t) T_o^T) T_o \chi + T_o \bar F(t) \w,\nonumber\\
+& = 
+\begin{bmatrix}
+-(R_{bi}(\Omega_{\mathrm{IMU}}+b_\Omega))^\wedge & R_{bi} \\
+0 & 0 
+\end{bmatrix}
+\chi 
++
+\begin{bmatrix}
+0 & R_{bi} & 0 & 0 \\
+0 & 0 & 0 & I_{3\times 3}\\
+\end{bmatrix}
+\w\nonumber\\
+&\triangleq  \bar A_o(t)\chi_o + \bar F_o(t)\w,\\
+\delta z & = (\bar H T_o^T) T_o \chi = \begin{bmatrix} I_{3\times 3} & 0\end{bmatrix}\chi_o\nonumber \\
+& \triangleq \bar H_o \chi_o.
+\end{align}
+Also
+\[
+P_o = \mathrm{E} [(\chi_o-\bar\chi_o)(\chi_o-\bar\chi_o)^T]= \mathrm{E}[ T_o(\chi-\bar\chi)(\chi-\bar\chi)T_o^T]
+= \mathrm{E}[ T_oT(\x-\bar\x)(\x-\bar\x)T^TT_o^T] = T_o T P T^T T_o^T.
+\]
+\paragraph{Correction}
+
+
+The above equation  is considered as the linearized measurement equation for EKF with the residual or the innovation term $\delta z$. Let $V_\zeta\in\Re^{3\times 3}$ be the covariance of the measurement error $\zeta$. The residual (or innovation) covariance $S\in\Re^{3\times 3}$ is
+\begin{align}
+S & = \bar H_o P_o \bar H_o^T + R_{bi} V_\zeta R_{bi}^T
+= (H T^T T_o^T)( T_o T P T^T T_o^T )T_o T H^T + R_{bi} V_\zeta R_{bi}^T
+%= H T_{s} P T_{s}' H^T + R_{bi} V_\zeta R_{bi}^T,
+\nonumber\\
+& = H P H^T +R_{bi} V_\zeta R_{bi}^T.
+\end{align}
+ The Kalman gain $\bar K_o\in\Re^{6\times 3}$ is given by
+\begin{equation}
+\bar K_o = P_o \bar H_o ^T S^{-1}= (T_o T P T^T T_o^T)(T_o T H^T),
+\end{equation}
+and the a posteriori value of the perturbed state is given by 
+\begin{equation}
+\chi^+ = \bar K_o \delta z.
+%\\\x^+ = T^T \chi^+ = T^T \bar K_o \delta z
+\end{equation}
+Or equivalently,
+\begin{equation}
+\x^+ = T^T T_o^T \bar K_o \delta z \triangleq K \delta z.
+\end{equation}
+
+The a posteriori state is
+\begin{equation}
+%x^+ = x^- +  \delta x^+,\quad v^+ = v^-+\delta v^+,\quad 
+\bar R^+ =\bar R^- \exp(\hat \eta^+),
+%\quad b_a^+=b_a^- + \delta b_a^+, 
+\quad 
+b_\Omega^+=b_\Omega^- + \delta b_\Omega^+,
+\end{equation}
+and the a posteriori covariance is
+\begin{equation}
+P^+ = (I_{15\times 15}-KH)P^-= (I_{15\times 15}-KH)P^-(I_{15\times 15}-KH)^T + K R_{bi} V_\zeta R_{bi}^T K^T,
+\end{equation}
+where the latter is known as the Joseph form, which is implemented to preserve the symmetry and the positive-definiteness of $P$ in numerical computation.
+
+
+\newcommand{\V}{\mathrm{VICON}}
+
+\subsection{Correction via VICON}
+
+The VICON measures the location in the $v$-frame and the attitude from the $m$-frame to the $v$-frame, namely $(x_\V, R_\V)$.
+\begin{align*}
+x_\V &= R_{vf} x + \zeta_x,\\
+R_\V &= R_{vm}\exp\hat\zeta_R = R_{vf} R R_{bi}R_{im}\exp\hat\zeta_R,
+\end{align*}
+where $\zeta_x,\zeta_R$ denote the measurement noise for $x_\V$ and $R_\V$, respectively. 
+
+Similar to above, the estimate of $R_\V$ is given by $\bar R_\V =R_{vf} R R_{bm}$, and the difference between $R_\V$ and $\bar R_V$ is formulated as
+\begin{align*}
+R_\V & = R_{vf} \bar R \exp\hat\eta R_{bi}R_{im}\exp\hat\zeta_R\\
+& = R_{vf} \bar R R_{bi}R_{im}
++R_{vf} \bar R \hat\eta R_{bi}R_{im}
++R_{vf} \bar R R_{bi}R_{im}\hat\zeta_R,
+\end{align*}
+after ignoring the higher order terms of $\zeta_R$ and $\eta$. This is rearranged into
+\begin{align*}
+\bar R^T R_{vf}^T R_\V R_{im}^T R_{bi}^T 
+& =  I_{3\times 3}
++ \hat\eta 
++ \widehat{R_{bm}\zeta_R},
+\end{align*}
+or equivalently
+\begin{align*}
+(\bar R^T R_{vf}^T R_\V R_{im}^T R_{bi}^T  -I_{3\times 3})^\vee
+& =  \eta +R_{bm}\zeta_R.
+\end{align*}
+Projecting the left hand side onto the skew-symmetric matrices,
+\begin{align*}
+\frac{1}{2}(\bar R^T R_{vf}^T R_\V R_{im}^T R_{bi}^T  -R_{bi}R_{im} R_\V^T R_{vf}\bar R)^\vee
+& =  \eta +R_{bm}\zeta_R.
+\end{align*}
+
+Similarly,
+\[
+x_\V = R_{vf}\bar x + R_{vf}\delta x + \zeta_x.
+\]
+
+The linearized measurement equation is written as
+\begin{align*}
+\delta z=\begin{bmatrix} \frac{1}{2}(\bar R^T R_{vf}^T R_\V R_{im}^T R_{bi}^T  -R_{bi}R_{im} R_\V^T R_{vf}\bar R)^\vee\\
+x_V-R_{vf}\bar x\end{bmatrix}
+= 
+\begin{bmatrix}
+\eta \\
+R_{vf} \delta x 
+\end{bmatrix}
++
+\begin{bmatrix}
+R_{bi}R_{im}\zeta_R \\
+\zeta_x
+\end{bmatrix}
+=
+H\x + G\mathbf{v},
+\end{align*}
+where $\mathbf{v}=[\zeta_R; \zeta_x]\in\Re^6$, and the matrices $H\in\Re^{6\times 15}$ and $G\in\Re^{6\times 6}$ are given by
+\begin{align*}
+H = \begin{bmatrix} 0 & 0 & I_{3\times 3} & 0 & 0\\
+R_{vf} & 0 & 0 & 0 & 0
+\end{bmatrix},\quad
+G=\begin{bmatrix} 
+R_{bi}R_{im} & 0 \\
+0 & I_{3\times 3}\end{bmatrix}.
+\end{align*}
+
+Let $V\in\Re^{6\times 6}$ be the covariance of $\mathbf{v}$. The residual covariance  $S\in\Re^{6\times 6}$ is given by
+\[
+S= HPH^T + GVG^T.
+\]
+The Kalman gain $K\in\Re^{15\times 6}$ is given by
+\begin{equation}
+K = P H^T S^{-1},
+\end{equation}
+and the a posteriori value of the perturbed state is given by 
+\begin{equation}
+\x^+ = K \delta z.
+\end{equation}
+The a posteriori state is
+\begin{equation}
+x^+ = x^- +  \delta x^+,\quad v^+ = v^-+\delta v^+,\quad \bar R^+ =\bar R^- \exp(\hat \eta^+),\quad b_a^+=b_a^- + \delta b_a^+, \quad b_\Omega^+=b_\Omega^- + \delta b_\Omega^+.
+\end{equation}
+The a posteriori covariance is
+\begin{equation}
+P^+ = (I_{15\times 15}-KH)P^-= (I_{15\times 15}-KH)P^-(I_{15\times 15}-KH)^T + K GVG^T K^T,
+\end{equation}
+where the latter is known as the Joseph form, which is implemented to preserve the symmetry and the positive-definiteness of $P$ in numerical computation.
+
+
+\subsection{Low-Pass Filter for $\Omega$}
+
+In the above formulation of Kalman filter, the angular velocity measurement is considered as a known time-varying signal. Even after correcting it with the gyro bias, $\bar \Omega_k$ obtained by \refeqn{W_bar} is subject to high-frequency noise, which causes undesired irregular vibrations in the corresponding control input. 
+
+A simple first order low-pass filter is represented by
+\[
+G(s) = \frac{1}{\tau s+ 1},
+\]
+where $\tau$ represents the time-constant, i.e., the time which the initial condition becomes reduced by the factor of $\frac{1}{e}=0.368$. For the sinusoidal inputs, 
+\[
+|G(j\omega)| = \frac{1}{\sqrt{1+\omega^2\tau^2}}
+\]
+Therefore, the bandwidth, the frequency where $|G(j\omega)|^2=0.5$ becomes $\omega=\frac{1}{\tau}$. For example, when the bandwidth is set for $f=100\,\mathrm{Hz}$, or equivalently $\omega=2\pi f$, then the time constant is chosen as
+\[
+\tau = \frac{1}{\omega} = \frac{1}{2\pi f} = 0.0016 \,\mathrm{sec}.
+\]
+
+In the continuous time, the filter equation is written as
+\[
+\tau \dot y + y = u,
+\]
+which can be approximated by
+\[
+\tau (y_{k}-y_{k-1}) +  h y_k = h u_k,
+\]
+or equivalently
+\[
+y_k = \frac{1}{h+\tau} ( \tau y_{k-1} + h u_k)=(1-\alpha) y_{k-1} + \alpha u_{k},
+\]
+where $\alpha=\frac{h}{\tau +h }$. 
+
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Brogan(1991)]{Bro91}
+W.~Brogan.
+\newblock \emph{Modern Control Theory}.
+\newblock Prentice Hall, 1991.
+
+\bibitem[Lee et~al.(2010)Lee, Leok, and McClamroch]{LeeLeoPICDC10}
+T.~Lee, M.~Leok, and N.~McClamroch.
+\newblock Geometric tracking control of a quadrotor {UAV} on {SE(3)}.
+\newblock In \emph{Proceedings of the IEEE Conference on Decision and Control},
+  pages 5420--5425, Atlanta, GA, Dec. 2010.
+
+\end{thebibliography}
+
+
+
+
+%\bibliography{/Users/tylee/Documents/BibMaster17,/Users/tylee/Documents/tylee}
+%\bibliographystyle{IEEEtran}
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

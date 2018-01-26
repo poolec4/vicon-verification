@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/jetson.dir/src/main_Jetson.cpp.o  -o jetson  -L/usr/local/lib -rdynamic libuav.a libhost.a libvn100.a -lvrpn -lsbp -lserialport -pthread -Wl,-rpath,/usr/local/lib 

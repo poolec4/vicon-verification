@@ -1,0 +1,2 @@
+/usr/bin/ar qc libuav.a  CMakeFiles/uav.dir/src/fdcl_vicon.cpp.o CMakeFiles/uav.dir/src/fdcl_vn100.cpp.o CMakeFiles/uav.dir/src/fdcl_i2c.cpp.o CMakeFiles/uav.dir/src/fdcl_EKF.cpp.o CMakeFiles/uav.dir/src/misc_matrix_func.cpp.o CMakeFiles/uav.dir/src/fdcl_control.cpp.o
+/usr/bin/ranlib libuav.a

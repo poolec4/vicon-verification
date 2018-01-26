@@ -1,0 +1,137 @@
+// Uncomment fdcl_i2C motor error print lines
+
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <math.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <iostream>
+
+#include "Eigen/Dense"
+
+#include "main_Jetson.h"
+#include "fdcl_param.h"
+#include "fdcl_control.h"
+#include "fdcl_i2c.h"
+#include "fdcl_wifi.h"
+#include "misc_matrix_func.h"
+#include "fdcl_EKF.h"
+#include "fdcl_vn100.h"
+#include "fdcl_vicon.h"
+
+using Eigen::MatrixXd;
+using namespace std;
+
+bool SYSTEM_ON=true;
+bool MOTOR_ON=false;
+bool CALIBRATE_ON=false;
+bool CALIBRATE_DONE=false;
+int  COMMAND_MODE=0;
+
+#define NUM_THREADS 5
+
+pthread_mutex_t UAV_data_mutex;
+
+struct COMMAND_type COMM;
+
+fdcl_param file_cfg;
+fdcl_EKF UAV;
+fdcl_wifi WIFI;
+fdcl_vn100 IMU;
+fdcl_vicon VICON;
+fdcl_i2c MOTOR;
+fdcl_control CTRL;
+
+void *data_thread(void *thread_id);
+void *vicon_thread(void *thread_id);
+void *zed_thread(void *thread_id);
+
+int main()
+{
+	pthread_t threads[NUM_THREADS];
+	pthread_attr_t attr;
+	struct sched_param  param;
+	int fifo_max_prio, fifo_min_prio, fifo_mid_prio;
+
+	// initialize state
+	file_cfg.open("../jetson_SEH.cfg");
+	UAV.load_config(file_cfg);
+	WIFI.load_config(file_cfg);
+	IMU.load_config(file_cfg);
+	VICON.load_config(file_cfg);
+	MOTOR.load_config(file_cfg);
+	CTRL.load_config(file_cfg);
+
+	// Initialize mutex and condition variables
+	pthread_mutex_init(&UAV_data_mutex, NULL);
+
+	// Set thread attributes
+	pthread_attr_init(&attr);
+	pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	fifo_max_prio = sched_get_priority_max(SCHED_FIFO);
+	fifo_min_prio = sched_get_priority_min(SCHED_FIFO);
+	fifo_mid_prio = (fifo_max_prio + fifo_min_prio) / 2;
+
+	printf("creating threads...\n");
+
+	param.sched_priority = fifo_max_prio;
+	pthread_attr_setschedparam(&attr, &param);
+	pthread_create(&threads[0], &attr, data_thread, (void *) 0);
+	pthread_create(&threads[1], &attr, vicon_thread, (void *) 0);
+	pthread_create(&threads[2], &attr, zed_thread, (void *) 0);
+
+	pthread_join(threads[0], NULL);
+	pthread_join(threads[1], NULL);
+	pthread_join(threads[2], NULL);
+
+	pthread_attr_destroy(&attr);
+	pthread_mutex_destroy(&UAV_data_mutex);
+
+	file_cfg.close();
+	printf("threads closed\n");
+
+	return 0;
+}
+
+
+void *zed_thread(void *thread_id)
+{
+
+	printf("ZED: thread initialized..\n");
+
+
+	printf("ZED: thread closing\n");
+	pthread_exit(NULL);
+
+}
+
+void *data_thread(void *thread_id)
+{
+	printf("DATA: thread initialized..\n");
+
+	
+
+	printf("DATA: thread closing\n");
+
+	pthread_exit(NULL);
+
+}
+
+void *vicon_thread(void *thread_id)
+{
+	VICON.open();
+	cout << "fdcl_vicon: opened" << endl;
+
+	while(SYSTEM_ON==true)
+		VICON.loop();
+
+	VICON.close();
+	cout << "fdcl_vicon: closed" << endl;
+	pthread_exit(NULL);
+
+}

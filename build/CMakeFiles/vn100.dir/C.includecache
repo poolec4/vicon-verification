@@ -1,0 +1,100 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../libraries/vectornav/include/vn100.h
+vnint.h
+../libraries/vectornav/include/vnint.h
+stdint.h
+-
+vndevice.h
+../libraries/vectornav/include/vndevice.h
+vncp_services.h
+../libraries/vectornav/include/vncp_services.h
+vn_kinematics.h
+../libraries/vectornav/include/vn_kinematics.h
+vn_linearAlgebra.h
+../libraries/vectornav/include/vn_linearAlgebra.h
+
+../libraries/vectornav/include/vn_errorCodes.h
+vnint.h
+../libraries/vectornav/include/vnint.h
+stdint.h
+-
+
+../libraries/vectornav/include/vn_kinematics.h
+
+../libraries/vectornav/include/vn_linearAlgebra.h
+
+../libraries/vectornav/include/vncp_services.h
+vnint.h
+../libraries/vectornav/include/vnint.h
+stdint.h
+-
+Windows.h
+-
+pthread.h
+-
+stdbool.h
+-
+vn_errorCodes.h
+../libraries/vectornav/include/vn_errorCodes.h
+
+../libraries/vectornav/include/vndevice.h
+vnint.h
+../libraries/vectornav/include/vnint.h
+stdint.h
+-
+vncp_services.h
+../libraries/vectornav/include/vncp_services.h
+vn_kinematics.h
+../libraries/vectornav/include/vn_kinematics.h
+vn_linearAlgebra.h
+../libraries/vectornav/include/vn_linearAlgebra.h
+
+../libraries/vectornav/include/vnint.h
+
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/arch/linux/vncp_services.c
+stdlib.h
+-
+unistd.h
+-
+fcntl.h
+-
+termios.h
+-
+errno.h
+-
+string.h
+-
+vncp_services.h
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/arch/linux/vncp_services.h
+vn_errorCodes.h
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/arch/linux/vn_errorCodes.h
+
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/vn100.c
+stdlib.h
+-
+string.h
+-
+stdio.h
+-
+vn100.h
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/vn100.h
+vn_errorCodes.h
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/vn_errorCodes.h
+
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/vndevice.c
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+vndevice.h
+/home/chris/Google Drive/FDCL/Chris/Zed/vicon-verification/libraries/vectornav/src/vndevice.h
+

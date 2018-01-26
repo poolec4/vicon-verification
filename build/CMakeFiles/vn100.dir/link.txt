@@ -1,0 +1,2 @@
+/usr/bin/ar qc libvn100.a  CMakeFiles/vn100.dir/libraries/vectornav/src/vn100.c.o CMakeFiles/vn100.dir/libraries/vectornav/src/vndevice.c.o CMakeFiles/vn100.dir/libraries/vectornav/src/arch/linux/vncp_services.c.o
+/usr/bin/ranlib libvn100.a
