@@ -68,7 +68,7 @@ int main()
 	CTRL.load_config(file_cfg);
 
 	// Set ZED parameters
-	Camera zed;
+	sl::Camera zed;
 	InitParameters init_params;
 	init_params.camera_resolution = RESOLUTION_HD720; // Use HD720 video mode (default fps: 60)
 	init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP; // Use a right-handed Y-up coordinate system
