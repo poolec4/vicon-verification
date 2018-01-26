@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <iostream>
+#include <sl/Camera.hpp>
 
 #include "Eigen/Dense"
 
@@ -66,6 +67,13 @@ int main()
 	MOTOR.load_config(file_cfg);
 	CTRL.load_config(file_cfg);
 
+	// Set ZED parameters
+	Camera zed;
+	InitParameters init_params;
+	init_params.camera_resolution = RESOLUTION_HD720; // Use HD720 video mode (default fps: 60)
+	init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP; // Use a right-handed Y-up coordinate system
+	init_params.coordinate_units = UNIT_METER; // Set units in meters
+
 	// Initialize mutex and condition variables
 	pthread_mutex_init(&UAV_data_mutex, NULL);
 
@@ -75,7 +83,6 @@ int main()
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	fifo_max_prio = sched_get_priority_max(SCHED_FIFO);
 	fifo_min_prio = sched_get_priority_min(SCHED_FIFO);
-	fifo_mid_prio = (fifo_max_prio + fifo_min_prio) / 2;
 
 	printf("creating threads...\n");
 
