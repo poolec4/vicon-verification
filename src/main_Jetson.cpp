@@ -127,7 +127,7 @@ void *zed_thread(void *thread_id)
 	        // Get the pose of the camera relative to the world frame
 	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
 	        // Display translation and timestamp
-	        printf("Translation: tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\n",
+	        printf("ZED   tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\n",
 	        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
 	        // Display orientation quaternion
 	        printf("Orientation: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
