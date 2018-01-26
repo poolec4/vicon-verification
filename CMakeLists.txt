@@ -64,7 +64,9 @@ FILE(GLOB_RECURSE HDR_FILES include/*.hpp)
 set(jetson_src
     src/main_Jetson.cpp
 )
+
 add_executable(jetson ${jetson_src})
+add_definitions(-std=c++11 -g -O3)
 target_link_libraries(jetson
     uav
     host
