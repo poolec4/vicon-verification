@@ -73,7 +73,6 @@ set(jetson_src
 )
 
 add_executable(jetson ${jetson_src})
-add_definitions(-std=c++11 -g -O3)
 target_link_libraries(jetson
     uav
     host
@@ -85,9 +84,7 @@ target_link_libraries(jetson
     ${GLEW_LIBRARY}
     ${SPECIAL_OS_LIBS}
     ${OPENGL_LIBRARIES}
-    ${CUDA_CUDA_LIBRARY} 
-    ${CUDA_CUDART_LIBRARY} 
-    ${CUDA_NPP_LIBRARIES_ZED}
+    ${CUDA_LIBRARIES} ${CUDA_npps_LIBRARY} ${CUDA_NPP_LIBRARIES_ZED}
 )
 target_compile_options(jetson PRIVATE -pthread -Wall -o -lrt -lm -lvrpn -lquat -pthread -lserialport -lsbp -O3 -std=c++11)
 

@@ -38,8 +38,8 @@ int  COMMAND_MODE=0;
 using namespace std;
 using namespace sl;
 
-Camera zed;
-Pose camera_pose;
+sl::Camera zed;
+sl::Pose camera_pose;
 std::thread zed_callback;
 bool quit = false;
 // OpenGL window to display camera motion
