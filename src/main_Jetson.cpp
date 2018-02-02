@@ -184,21 +184,21 @@ void *zed_thread(void *thread_id)
 			myfile << std::fixed << std::setprecision(8) << zed_pose.timestamp <<",";
 			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tx <<",";
 			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ty <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tz <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tz <<"\n";
 			// ZED orientation
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ox <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oy <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oz <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ow <<",";
-			// VICON translation
-			myfile << std::fixed << std::setprecision(8) << UAV.x_v(0) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.x_v(1) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.x_v(2) <<",";
-			// VICON orientation
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(0) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(1) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(2) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(3) <<"\n";
+			//myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ox <<",";
+			//myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oy <<",";
+			//myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oz <<",";
+			//myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ow <<",";
+			//// VICON translation
+			//myfile << std::fixed << std::setprecision(8) << UAV.x_v(0) <<",";
+			//myfile << std::fixed << std::setprecision(8) << UAV.x_v(1) <<",";
+			//myfile << std::fixed << std::setprecision(8) << UAV.x_v(2) <<",";
+			//// VICON orientation
+			//myfile << std::fixed << std::setprecision(8) << UAV.q_v(0) <<",";
+			//myfile << std::fixed << std::setprecision(8) << UAV.q_v(1) <<",";
+			//myfile << std::fixed << std::setprecision(8) << UAV.q_v(2) <<",";
+			//myfile << std::fixed << std::setprecision(8) << UAV.q_v(3) <<"\n";
 
 			myfile.close();	
 		}
