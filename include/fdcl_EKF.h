@@ -84,7 +84,7 @@ public:
 	void load_config(fdcl_param& );
 	void reset(fdcl_param&);
 	void callback_IMU(Vector3 a_i, Vector3 W_i, Matrix3 R_ni);
-	void callback_VICON(Vector3 x_v, Matrix3 R_vm);
+	void callback_VICON(Vector3 x_v, Vector4 q_v, Matrix3 R_vm);
 	void Estimation_Prediction();
 	void Estimation_Correction_IMU();
 	void Estimation_Correction_VICON();
