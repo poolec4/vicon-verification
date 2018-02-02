@@ -39,8 +39,8 @@ int  COMMAND_MODE=0;
 
 // ZED includes and definitions
 sl::Camera zed;
-sl::Pose camera_pose;
-std::thread zed_callback;
+//sl::Pose camera_pose;
+//std::thread zed_callback;
 bool quit = false;
 // OpenGL window to display camera motion
 //GLViewer viewer;
@@ -161,6 +161,7 @@ int main()
 void *zed_thread(void *thread_id)
 {
 	printf("ZED: thread initialized..\n");
+	ofstream myfile;
 
 	while(SYSTEM_ON == true)
 	{
@@ -178,9 +179,6 @@ void *zed_thread(void *thread_id)
 
 			//printf("Vicon tx: %.3f  ty: %.3f  tz: %.3f \n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
 		
-
-		  	ofstream myfile;
-
 			myfile.open (FileName,fstream::app);
 			// ZED translation
 			myfile << std::fixed << std::setprecision(8) << zed_pose.timestamp <<",";
