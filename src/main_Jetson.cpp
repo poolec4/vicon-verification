@@ -1,4 +1,5 @@
 // Uncomment fdcl_i2C motor error print lines
+#define FileName "2018_02_02_zed_verification.txt"
 
 #include <pthread.h>
 #include <stdio.h>
@@ -133,6 +134,32 @@ void *zed_thread(void *thread_id)
 	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
 
 			//printf("Vicon tx: %.3f  ty: %.3f  tz: %.3f \n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
+		
+
+		  	ofstream myfile;
+
+			myfile.open (FileName,fstream::app);
+			// ZED translation
+			myfile << std::fixed << std::setprecision(8) << zed_pose.timestamp <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tx <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ty <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tz <<",";
+			// ZED orientation
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ox <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().oy <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().oz <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ow <<",";
+			// VICON translation
+			myfile << std::fixed << std::setprecision(8) << UAV.x_v(0) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.x_v(1) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.x_v(2) <<",";
+			// VICON orientation
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(0) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(1) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(2) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(3) <<"\n";
+
+			myfile.close();	
 		}
 	}
 
@@ -144,7 +171,6 @@ void *data_thread(void *thread_id)
 {
 	printf("DATA: thread initialized..\n");
 
-	
 
 	printf("DATA: thread closing\n");
 

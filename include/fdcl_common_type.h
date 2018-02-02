@@ -4,6 +4,7 @@
 
 typedef Eigen::Matrix<double, 3, 3> Matrix3;
 typedef Eigen::Matrix<double, 3, 1> Vector3;
+typedef Eigen::Matrix<double, 4, 1> Vector4;
 typedef Eigen::Matrix<double, 6, 6> Matrix6;
 typedef Eigen::Matrix<double, 6, 1> Vector6;
 typedef Eigen::Matrix<double, 9, 9> Matrix9;
@@ -37,6 +38,7 @@ struct UAV_state_type {
 
 	// VICON measurements
 	Vector3 x_v;
+	Vector4 q_v;
 	Matrix3 R_vm;
 	Vector3 x_f_VICON; // x_v coordinate transform to the f-frame, x
 	Matrix3 R_fb_VICON; // R_vm coordinate transformed to R_fb
