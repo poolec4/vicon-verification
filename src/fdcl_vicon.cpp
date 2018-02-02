@@ -38,11 +38,17 @@ void fdcl_vicon::loop()
 void fdcl_vicon::callback(void* userdata, const vrpn_TRACKERCB tdata)
 {
 	Vector3 x_v;
+	Vector4 q_v;
 	Matrix3 R_vm;
 
 	x_v(0)=tdata.pos[0];
 	x_v(1)=tdata.pos[1];
 	x_v(2)=tdata.pos[2];
+
+	q_v(0) = tdata.quat[0];
+	q_v(1) = tdata.quat[1];
+	q_v(2) = tdata.quat[2];
+	q_v(3) = tdata.quat[3];
 
 	R_vm(0,0) = 1-(2*(tdata.quat[1])*(tdata.quat[1]))-(2*(tdata.quat[2])*(tdata.quat[2]));
     R_vm(0,1) = (2*tdata.quat[0]*tdata.quat[1])-(2*tdata.quat[3]*tdata.quat[2]);
@@ -54,5 +60,5 @@ void fdcl_vicon::callback(void* userdata, const vrpn_TRACKERCB tdata)
     R_vm(2,1) = (2*tdata.quat[0]*tdata.quat[3])+(2*tdata.quat[2]*tdata.quat[1]);
     R_vm(2,2) = 1-(2*(tdata.quat[0])*(tdata.quat[0]))-(2*(tdata.quat[1])*(tdata.quat[1]));
 
-	UAV.callback_VICON(x_v,R_vm);
+	UAV.callback_VICON(x_v,q_v,R_vm);
 }

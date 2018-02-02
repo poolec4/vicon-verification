@@ -1,4 +1,5 @@
 // Uncomment fdcl_i2C motor error print lines
+#define FileName "2018_02_02_zed_verification.txt"
 
 #include <pthread.h>
 #include <stdio.h>
@@ -10,7 +11,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <iostream>
+<<<<<<< HEAD
 #include <fstream>
+=======
+>>>>>>> zed_api
 #include <sl/Camera.hpp>
 
 #include "Eigen/Dense"
@@ -26,6 +30,12 @@
 #include "fdcl_vicon.h"
 
 using Eigen::MatrixXd;
+<<<<<<< HEAD
+=======
+using namespace std;
+using namespace sl;
+sl::Camera zed;
+>>>>>>> zed_api
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
@@ -87,6 +97,19 @@ int main()
 	MOTOR.load_config(file_cfg);
 	CTRL.load_config(file_cfg);
 
+	// Set ZED parameters
+	InitParameters init_params;
+	init_params.camera_resolution = RESOLUTION_HD720; // Use HD720 video mode (default fps: 60)
+	init_params.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP; // Use a right-handed Y-up coordinate system
+	init_params.coordinate_units = UNIT_METER; // Set units in meters
+
+	// Open ZED
+	zed.open(init_params);
+	
+	// Enable positional tracking with default parameters
+	sl::TrackingParameters tracking_parameters;
+	zed.enableTracking(tracking_parameters);
+	
 	// Initialize mutex and condition variables
 	pthread_mutex_init(&UAV_data_mutex, NULL);
 
@@ -96,7 +119,6 @@ int main()
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	fifo_max_prio = sched_get_priority_max(SCHED_FIFO);
 	fifo_min_prio = sched_get_priority_min(SCHED_FIFO);
-	fifo_mid_prio = (fifo_max_prio + fifo_min_prio) / 2;
 
 	printf("creating threads...\n");
 
@@ -148,94 +170,60 @@ int main()
 
 void *zed_thread(void *thread_id)
 {
-
 	printf("ZED: thread initialized..\n");
 
-     float tx = 0, ty = 0, tz = 0;
-    float rx = 0, ry = 0, rz = 0;
+	while(SYSTEM_ON == true)
+	{
+		sl::Pose zed_pose;
+		if (zed.grab() == SUCCESS) 
+		{
+	        // Get the pose of the camera relative to the world frame
+	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
+	        // Display translation and timestamp
+	        printf("ZED   tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\n",
+	        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
+	        // Display orientation quaternion
+	        printf("Orientation: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
+	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
 
-    // Get the distance between the center of the camera and the left eye
-    float translation_left_to_center = zed.getCameraInformation().calibration_parameters.T.x * 0.5f;
+			//printf("Vicon tx: %.3f  ty: %.3f  tz: %.3f \n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
+		
 
-    // Create text for GUI
-    char text_rotation[MAX_CHAR];
-    char text_translation[MAX_CHAR];
+		  	ofstream myfile;
 
-    // Create a CSV file to log motion tracking data
-    std::ofstream outputFile;
-    std::string csvName = "Motion_data";
-    outputFile.open(csvName + ".csv");
-    if (!outputFile.is_open())
-        cout << "WARNING: Can't create CSV file. Run the application with administrator rights." << endl;
-    else
-        outputFile << "Timestamp(ns);Rotation_X(rad);Rotation_Y(rad);Rotation_Z(rad);Position_X(m);Position_Y(m);Position_Z(m);" << endl;
+			myfile.open (FileName,fstream::app);
+			// ZED translation
+			myfile << std::fixed << std::setprecision(8) << zed_pose.timestamp <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tx <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ty <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tz <<",";
+			// ZED orientation
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ox <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().oy <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().oz <<",";
+			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ow <<",";
+			// VICON translation
+			myfile << std::fixed << std::setprecision(8) << UAV.x_v(0) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.x_v(1) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.x_v(2) <<",";
+			// VICON orientation
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(0) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(1) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(2) <<",";
+			myfile << std::fixed << std::setprecision(8) << UAV.q.v(3) <<"\n";
 
-
-    while (!quit && zed.getSVOPosition() != zed.getSVONumberOfFrames() - 1) {
-        if (zed.grab() == SUCCESS) {
-            // Get the position of the camera in a fixed reference frame (the World Frame)
-            TRACKING_STATE tracking_state = zed.getPosition(camera_pose, sl::REFERENCE_FRAME_WORLD);
-
-            if (tracking_state == TRACKING_STATE_OK) {
-                // getPosition() outputs the position of the Camera Frame, which is located on the left eye of the camera.
-                // To get the position of the center of the camera, we transform the pose data into a new frame located at the center of the camera.
-                // The generic formula used here is: Pose(new reference frame) = M.inverse() * Pose (camera frame) * M, where M is the transform between two frames.
-                transformPose(camera_pose.pose_data, translation_left_to_center); // Get the pose at the center of the camera (baseline/2 on X axis)
-
-                // Update camera position in the viewing window
-                //viewer.updateZEDPosition(camera_pose.pose_data);
-
-                // Get quaternion, rotation and translation
-                sl::float4 quaternion = camera_pose.getOrientation();
-                sl::float3 rotation = camera_pose.getEulerAngles(); // Only use Euler angles to display absolute angle values. Use quaternions for transforms.
-                sl::float3 translation = camera_pose.getTranslation();
-
-                // Display translation and rotation (pitch, yaw, roll in OpenGL coordinate system)
-                snprintf(text_rotation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", rotation.x, rotation.y, rotation.z);
-                snprintf(text_translation, MAX_CHAR, "%3.2f; %3.2f; %3.2f", translation.x, translation.y, translation.z);
-
-                printf("%3.2f; %3.2f; %3.2f", rotation.x, rotation.y, rotation.z);
-                printf("%3.2f; %3.2f; %3.2f", translation.x, translation.y, translation.z);
-
-                // Save the pose data in a csv file
-                if (outputFile.is_open())
-                    outputFile << zed.getTimestamp(sl::TIME_REFERENCE::TIME_REFERENCE_IMAGE) << "; " << text_rotation << "; " << text_translation << ";" << endl;
-            }
-
-            // Update rotation, translation and tracking state values in the OpenGL window
-            //viewer.updateText(string(text_translation), string(text_rotation), tracking_state);
-        } else sl::sleep_ms(1);
-    }
+			myfile.close();	
+		}
+	}
 
 	printf("ZED: thread closing\n");
 	pthread_exit(NULL);
-
-}
-
-
-void transformPose(sl::Transform &pose, float tx) {
-    sl::Transform transform_;
-    transform_.setIdentity();
-    // Move the tracking frame by tx along the X axis
-    transform_.tx = tx;
-    // Apply the transformation
-    pose = Transform::inverse(transform_) * pose * transform_;
-}
-
-void close() {
-    quit = true;
-    zed_callback.join();
-    zed.disableTracking("./ZED_spatial_memory"); // Record an area file
-
-    zed.close();
-    //viewer.exit();
 }
 
 void *data_thread(void *thread_id)
 {
 	printf("DATA: thread initialized..\n");
 
-	
 
 	printf("DATA: thread closing\n");
 
@@ -249,7 +237,9 @@ void *vicon_thread(void *thread_id)
 	printf("VICON: thread initialized..\n");
 
 	while(SYSTEM_ON==true)
+	{
 		VICON.loop();
+	}
 
 	VICON.close();
 	printf("VICON: thread closing\n");
