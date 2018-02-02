@@ -171,16 +171,16 @@ void *zed_thread(void *thread_id)
 	        // Get the pose of the camera relative to the world frame
 	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
 	        // Display translation and timestamp
-	        printf("POSITION"); 
+	        printf("POSITION\r"); 
 	       	printf("ZED:   tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\r",
 	        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
-	       	printf("Vicon: tx: %.3f  ty: %.3f  tz: %.3f \n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
+	       	printf("Vicon: tx: %.3f  ty: %.3f  tz: %.3f \r\r", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
 			
-			printf("ORITNETATION");
+			printf("ORITNETATION\r");
 			// Display orientation quaternion
 	        printf("ZED:   ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\r",
 	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
-        	printf("Vicon: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\r", UAV.q_v(0), UAV.q_v(1), UAV.q_v(2), UAV.q_v(3));
+        	printf("Vicon: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\r\r", UAV.q_v(0), UAV.q_v(1), UAV.q_v(2), UAV.q_v(3));
 		
 			myfile.open (FileName,fstream::app);
 			// ZED translation
