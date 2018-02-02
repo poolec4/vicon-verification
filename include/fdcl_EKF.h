@@ -51,6 +51,7 @@ public:
 
 	// VICON measurements
 	Vector3 x_v;
+	Vector4 q_v;
 	Matrix3 R_vm;
 	Vector3 x_f_VICON; // x_v coordinate transform to the f-frame, x
 	Matrix3 R_fb_VICON; // R_vm coordinate transformed to R_fb
