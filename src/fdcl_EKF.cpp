@@ -161,8 +161,8 @@ void fdcl_EKF::callback_IMU(Vector3 a_i, Vector3 W_i, Matrix3 R_ni)
 		Estimation_Correction_IMU();
 		pthread_mutex_unlock(&UAV_data_mutex);
 
-		if (residual > 10.)
-			cout << "WARNING: IMU.R_bf measurement residual too large " << residual << " deg" << endl;
+		//if (residual > 10.)
+		//	cout << "WARNING: IMU.R_bf measurement residual too large " << residual << " deg" << endl;
 
 	}
 
@@ -194,10 +194,10 @@ void fdcl_EKF::callback_VICON(Vector3 x_v, Vector4 q_v, Matrix3 R_vm)
 		Estimation_Correction_VICON();
 		pthread_mutex_unlock(&UAV_data_mutex);
 
-		if (residual_R > 10.)
-			cout << "WARNING: VICON.R_bf measurement residual too large " << residual_R << " deg" << endl;
-		if (residual_x > 0.1)
-			cout << "WARNING: VICON.x_f measurement residual too large " << residual_x << " m" << endl;
+		//if (residual_R > 10.)
+		//	cout << "WARNING: VICON.R_bf measurement residual too large " << residual_R << " deg" << endl;
+		//if (residual_x > 0.1)
+		//	cout << "WARNING: VICON.x_f measurement residual too large " << residual_x << " m" << endl;
 
 	}
 }
