@@ -170,7 +170,7 @@ void fdcl_EKF::callback_IMU(Vector3 a_i, Vector3 W_i, Matrix3 R_ni)
 
 }
 
-void fdcl_EKF::callback_VICON(Vector3 x_v, Matrix3 R_vm)
+void fdcl_EKF::callback_VICON(Vector3 x_v, Vector4 q_v, Matrix3 R_vm)
 {
 	t_VICON_pre=t_VICON;
 	t_VICON=gettime();
@@ -178,6 +178,7 @@ void fdcl_EKF::callback_VICON(Vector3 x_v, Matrix3 R_vm)
 
 //	cout << "fdcl_EKF::callback_VICON " << t_VICON << ", " << dt_VICON << endl;
 	this->x_v=x_v;
+	this->q_v=q_v;
 	this->R_vm=R_vm;
 
 
