@@ -45,10 +45,10 @@ void fdcl_vicon::callback(void* userdata, const vrpn_TRACKERCB tdata)
 	x_v(1)=tdata.pos[1];
 	x_v(2)=tdata.pos[2];
 
-	q_v(0) = tdata.quat[0];
-	q_v(1) = tdata.quat[1];
-	q_v(2) = tdata.quat[2];
-	q_v(3) = tdata.quat[3];
+	q_v(0) = tdata.quat[0]; //ox
+	q_v(1) = tdata.quat[1]; //oy
+	q_v(2) = tdata.quat[2]; //oz
+	q_v(3) = tdata.quat[3]; //ow
 
 	R_vm(0,0) = 1-(2*(tdata.quat[1])*(tdata.quat[1]))-(2*(tdata.quat[2])*(tdata.quat[2]));
     R_vm(0,1) = (2*tdata.quat[0]*tdata.quat[1])-(2*tdata.quat[3]*tdata.quat[2]);
