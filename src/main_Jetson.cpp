@@ -180,7 +180,7 @@ void *zed_thread(void *thread_id)
 			// Display orientation quaternion
 	        printf("ZED:   ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
 	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
-        	printf("Vicon: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\r", UAV.q_v(0), UAV.q_v(1), UAV.q_v(2), UAV.q_v(3));
+        	printf("Vicon: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n\n", UAV.q_v(0), UAV.q_v(1), UAV.q_v(2), UAV.q_v(3));
 		
 			myfile.open (FileName,fstream::app);
 			// ZED translation
