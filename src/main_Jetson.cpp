@@ -11,10 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <iostream>
-<<<<<<< HEAD
 #include <fstream>
-=======
->>>>>>> zed_api
 #include <sl/Camera.hpp>
 
 #include "Eigen/Dense"
@@ -30,12 +27,10 @@
 #include "fdcl_vicon.h"
 
 using Eigen::MatrixXd;
-<<<<<<< HEAD
-=======
 using namespace std;
 using namespace sl;
 sl::Camera zed;
->>>>>>> zed_api
+
 
 bool SYSTEM_ON=true;
 bool MOTOR_ON=false;
