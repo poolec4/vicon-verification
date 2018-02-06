@@ -1,0 +1,16 @@
+function [eangles] = rot_to_eangles( R )
+%ROT_TO_EANGLES Summary of this function goes here
+%   Detailed explanation goes here
+    
+    sy = sqrt(R(1,1)^2 + r(2,1)^2);
+    
+    if(sy > 1e-4)
+        phi = atan2(R(3,2), R(3,3));
+        psi = atan2(-R(3,1),sy);
+        theta = atan2(R(2,1), R(1,1));
+    else
+        phi = atan2(-R(2,3), R(2,2));
+        psi = atan2(-R
+        theta = 
+end
+
