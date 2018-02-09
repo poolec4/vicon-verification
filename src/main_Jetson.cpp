@@ -170,7 +170,6 @@ void *zed_thread(void *thread_id)
 	        // Get the pose of the camera relative to the world frame
 	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
 	        // Display translation and timestamp
-	        printf("ZED pose initializing");
 	        if (zed_pose.timestamp != 0)
 	        {
 		        printf("POSITION\n"); 
@@ -209,7 +208,7 @@ void *zed_thread(void *thread_id)
 			}
 			else
 			{
-				printf(".");
+	        	printf("ZED pose initializing...\r");
 			}
 		}
 	}
