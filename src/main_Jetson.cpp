@@ -119,7 +119,6 @@ int main()
     initParameters.coordinate_units = UNIT_METER;
     initParameters.coordinate_system = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
 
-
     // Set positional tracking parameters
     TrackingParameters trackingParameters;
     trackingParameters.initial_world_transform = sl::Transform::identity();
@@ -171,39 +170,47 @@ void *zed_thread(void *thread_id)
 	        // Get the pose of the camera relative to the world frame
 	        TRACKING_STATE state = zed.getPosition(zed_pose, REFERENCE_FRAME_WORLD);
 	        // Display translation and timestamp
-	        printf("POSITION\n"); 
-	       	printf("ZED:   tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\n",
-	        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
-	       	printf("Vicon: tx: %.3f  ty: %.3f  tz: %.3f \n\n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
+	        
+	        if (zed_pose.timestamp != 0)
+	        {
+		        printf("POSITION\n"); 
+		       	printf("ZED:   tx: %.3f, ty:  %.3f, tz:  %.3f, timestamp: %llu\n",
+		        zed_pose.getTranslation().tx, zed_pose.getTranslation().ty, zed_pose.getTranslation().tz, zed_pose.timestamp);
+		       	printf("Vicon: tx: %.3f  ty: %.3f  tz: %.3f \n\n", UAV.x_v(0), UAV.x_v(1), UAV.x_v(2));
+				
+				printf("ORITNETATION\n");
+				// Display orientation quaternion
+		        printf("ZED:   ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
+		        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
+	        	printf("Vicon: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n\n", UAV.q_v(0), UAV.q_v(1), UAV.q_v(2), UAV.q_v(3));
 			
-			printf("ORITNETATION\n");
-			// Display orientation quaternion
-	        printf("ZED:   ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n",
-	        zed_pose.getOrientation().ox, zed_pose.getOrientation().oy, zed_pose.getOrientation().oz, zed_pose.getOrientation().ow);
-        	printf("Vicon: ox: %.3f, oy:  %.3f, oz:  %.3f, ow: %.3f\n\n", UAV.q_v(0), UAV.q_v(1), UAV.q_v(2), UAV.q_v(3));
-		
-			myfile.open (FileName,fstream::app);
-			// ZED translation
-			myfile << std::fixed << std::setprecision(8) << zed_pose.timestamp <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tx <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ty <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tz <<",";
-			// ZED orientation
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ox <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oy <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oz <<",";
-			myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ow <<",";
-			// VICON translation
-			myfile << std::fixed << std::setprecision(8) << UAV.x_v(0) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.x_v(1) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.x_v(2) <<",";
-			// VICON orientation
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(0) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(1) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(2) <<",";
-			myfile << std::fixed << std::setprecision(8) << UAV.q_v(3) <<"\n";
+				myfile.open (FileName,fstream::app);
+				// ZED translation
+				myfile << std::fixed << std::setprecision(8) << zed_pose.timestamp <<",";
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tx <<",";
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().ty <<",";
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getTranslation().tz <<",";
+				// ZED orientation
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ox <<",";
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oy <<",";
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().oz <<",";
+				myfile << std::fixed << std::setprecision(8) << zed_pose.getOrientation().ow <<",";
+				// VICON translation
+				myfile << std::fixed << std::setprecision(8) << UAV.x_v(0) <<",";
+				myfile << std::fixed << std::setprecision(8) << UAV.x_v(1) <<",";
+				myfile << std::fixed << std::setprecision(8) << UAV.x_v(2) <<",";
+				// VICON orientation
+				myfile << std::fixed << std::setprecision(8) << UAV.q_v(0) <<",";
+				myfile << std::fixed << std::setprecision(8) << UAV.q_v(1) <<",";
+				myfile << std::fixed << std::setprecision(8) << UAV.q_v(2) <<",";
+				myfile << std::fixed << std::setprecision(8) << UAV.q_v(3) <<"\n";
 
-			myfile.close();	
+				myfile.close();	
+			}
+			else
+			{
+				printf("ZED initializing...");
+			}
 		}
 	}
 
